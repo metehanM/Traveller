@@ -31,24 +31,30 @@
             <div class="auth-switch">Hesabınız yok mu? <a href="signup.html">Kayıt Ol</a></div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script>
-    const supabaseUrl = 'https://eijgonyoasjqbejkhtns.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpamdvbnlvYXNqcWJlamtodG5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU2NjIwMzIsImV4cCI6MjA2MTIzODAzMn0.eh-ikHAWklwYT3ew66h5ecJi98hgI2nZ3jQ9KdcOWk0';
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRArf2VPbZuvLueY2qm2Lz9GhQXLvhzxY",
+      authDomain: "rentcars-1077b.firebaseapp.com",
+      projectId: "rentcars-1077b",
+      storageBucket: "rentcars-1077b.firebasestorage.app",
+      messagingSenderId: "564934399024",
+      appId: "1:564934399024:web:11dcb72be4d44e2a1709f5",
+      measurementId: "G-DMX2083TNQ"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
 
     document.getElementById('login-form').onsubmit = async function(e) {
         e.preventDefault();
         var email = document.getElementById('login-email').value.trim();
         var pass = document.getElementById('login-password').value.trim();
         if(email && pass) {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email: email,
-                password: pass
-            });
-            if (!error) {
+            try {
+                await auth.signInWithEmailAndPassword(email, pass);
                 window.location.href = 'index.html';
-            } else {
+            } catch (error) {
                 alert(error.message);
             }
         }
