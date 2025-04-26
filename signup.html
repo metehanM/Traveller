@@ -33,14 +33,28 @@
             <div class="auth-switch">Zaten hesabınız var mı? <a href="login.html">Giriş Yap</a></div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-    document.getElementById('signup-form').onsubmit = function(e) {
+    const supabaseUrl = 'https://eijgonyoasjqbejkhtns.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpamdvbnlvYXNqcWJlamtodG5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU2NjIwMzIsImV4cCI6MjA2MTIzODAzMn0.eh-ikHAWklwYT3ew66h5ecJi98hgI2nZ3jQ9KdcOWk0';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    document.getElementById('signup-form').onsubmit = async function(e) {
         e.preventDefault();
         var name = document.getElementById('register-name').value.trim();
         var email = document.getElementById('register-email').value.trim();
         var pass = document.getElementById('register-password').value.trim();
         if(name && email && pass) {
-            window.location.href = 'index.html';
+            const { data, error } = await supabase.auth.signUp({
+                email: email,
+                password: pass,
+                options: { data: { name: name } }
+            });
+            if (!error) {
+                window.location.href = 'index.html';
+            } else {
+                alert(error.message);
+            }
         }
     };
     </script>
