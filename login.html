@@ -53,7 +53,8 @@
         if(email && pass) {
             try {
                 await auth.signInWithEmailAndPassword(email, pass);
-                window.location.href = 'index.html';
+                window.open('index.html', '_blank');
+                window.close();
             } catch (error) {
                 alert(error.message);
             }

@@ -390,5 +390,56 @@
             </div>
         </div>
     </footer>
+
+    <!-- Profil Butonu ve Modal -->
+    <div id="profile-section" style="position:fixed;top:24px;right:32px;z-index:1000;">
+        <button id="profile-btn" style="background:none;border:none;cursor:pointer;">
+            <img src="assets/profile-icon.svg" alt="Profil" width="36" height="36" style="border-radius:50%;background:#eee;">
+        </button>
+        <div id="profile-modal" style="display:none;position:absolute;right:0;top:48px;background:#fff;padding:24px 32px;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.08);min-width:220px;">
+            <div id="profile-info">
+                <strong id="profile-name">Kullanıcı</strong><br>
+                <span id="profile-email" style="font-size:14px;color:#888"></span>
+            </div>
+            <button id="logout-btn" style="margin-top:16px;width:100%;background:#4318FF;color:#fff;padding:8px 0;border:none;border-radius:8px;cursor:pointer;">Çıkış Yap</button>
+        </div>
+    </div>
+
+    <!-- Profil JS ve Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyCRArf2VPbZuvLueY2qm2Lz9GhQXLvhzxY",
+        authDomain: "rentcars-1077b.firebaseapp.com",
+        projectId: "rentcars-1077b",
+        storageBucket: "rentcars-1077b.appspot.com",
+        messagingSenderId: "564934399024",
+        appId: "1:564934399024:web:11dcb72be4d44e2a1709f5",
+        measurementId: "G-DMX2083TNQ"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const profileBtn = document.getElementById('profile-btn');
+    const profileModal = document.getElementById('profile-modal');
+    const logoutBtn = document.getElementById('logout-btn');
+    profileBtn.onclick = () => profileModal.style.display = profileModal.style.display === 'block' ? 'none' : 'block';
+    document.addEventListener('click', function(e) {
+        if (!profileBtn.contains(e.target) && !profileModal.contains(e.target)) {
+            profileModal.style.display = 'none';
+        }
+    });
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            document.getElementById('profile-name').textContent = user.displayName || 'Kullanıcı';
+            document.getElementById('profile-email').textContent = user.email;
+        } else {
+            document.getElementById('profile-section').style.display = 'none';
+        }
+    });
+    logoutBtn.onclick = () => {
+        auth.signOut().then(() => { window.location.href = 'login.html'; });
+    };
+    </script>
 </body>
 </html> 
