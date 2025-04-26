@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Araç Kirala | Traveller</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { background: #F4F7FE; }
+    .booking-container { max-width: 600px; margin: 48px auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(67,24,255,0.08); padding: 40px 32px; }
+    .booking-title { text-align: center; margin-bottom: 24px; }
+    .booking-form { display: flex; flex-direction: column; gap: 16px; margin-bottom: 32px; }
+    .booking-form label { font-weight: 500; margin-bottom: 4px; }
+    .booking-form input, .booking-form select { padding: 12px; border-radius: 8px; border: 1px solid #E6E8F0; font-size: 16px; }
+    .car-list { display: flex; flex-direction: column; gap: 20px; }
+    .car-card { display: flex; align-items: center; gap: 20px; background: #F4F7FE; border-radius: 12px; padding: 16px; }
+    .car-card img { width: 100px; border-radius: 8px; }
+    .car-info { flex: 1; }
+    .car-info h3 { margin: 0 0 8px 0; }
+    .car-info span { color: #888; font-size: 15px; }
+    .btn-rent { background: #4318FF; color: #fff; border: none; border-radius: 8px; padding: 10px 24px; font-size: 16px; cursor: pointer; }
+    .go-profile { display: block; text-align: center; margin: 32px 0 0 0; color: #4318FF; text-decoration: none; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <div class="booking-container">
+    <h2 class="booking-title">Araç Kirala</h2>
+    <form class="booking-form" id="booking-form">
+      <div>
+        <label for="location">Konum</label>
+        <input type="text" id="location" placeholder="Konumunuzu girin" required>
+      </div>
+      <div>
+        <label for="pickup">Alış Tarihi</label>
+        <input type="datetime-local" id="pickup" required>
+      </div>
+      <div>
+        <label for="dropoff">İade Tarihi</label>
+        <input type="datetime-local" id="dropoff" required>
+      </div>
+    </form>
+    <div class="car-list" id="car-list"></div>
+    <a href="profile.html" class="go-profile">Sepetim & Profilim</a>
+  </div>
+  <script>
+    // Araçlar örnek veri
+    const cars = [
+      {id:1, name:'Jaguar XE L P250', price:1800, img:'assets/car1.jpg'},
+      {id:2, name:'BMW 3 Serisi', price:1500, img:'assets/car2.jpg'},
+      {id:3, name:'Mercedes-Benz C-Serisi', price:1600, img:'assets/car3.jpg'}
+    ];
+    // Araçları listele
+    function renderCars() {
+      const carList = document.getElementById('car-list');
+      carList.innerHTML = cars.map(car => `
+        <div class="car-card">
+          <img src="${car.img}" alt="${car.name}">
+          <div class="car-info">
+            <h3>${car.name}</h3>
+            <span>Fiyat: ${car.price} ₺/gün</span>
+          </div>
+          <button class="btn-rent" onclick="addToCart(${car.id})">Sepete Ekle</button>
+        </div>
+      `).join('');
+    }
+    renderCars();
+    // Sepete ekle fonksiyonu
+    function addToCart(carId) {
+      const location = document.getElementById('location').value.trim();
+      const pickup = document.getElementById('pickup').value;
+      const dropoff = document.getElementById('dropoff').value;
+      if (!location || !pickup || !dropoff) {
+        alert('Lütfen konum ve tarihleri doldurun!');
+        return;
+      }
+      const car = cars.find(c => c.id === carId);
+      if (!car) return;
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      cart.push({car, location, pickup, dropoff});
+      localStorage.setItem('cart', JSON.stringify(cart));
+      alert('Araç sepete eklendi!');
+    }
+  </script>
+</body>
+</html> 
