@@ -8,6 +8,40 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <style>
+    .btn-auth {
+      min-width: 110px;
+      padding: 10px 0;
+      font-size: 16px;
+      border-radius: 12px;
+      text-align: center;
+      margin-left: 8px;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(67,24,255,0.06);
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-primary.btn-auth {
+      background: var(--primary, #4318FF);
+      color: #fff;
+      border: none;
+    }
+    .btn-primary.btn-auth:hover {
+      background: #2d0fb2;
+    }
+    .btn-secondary.btn-auth {
+      background: #fff;
+      color: var(--primary, #4318FF);
+      border: 2px solid var(--primary, #4318FF);
+    }
+    .btn-secondary.btn-auth:hover {
+      background: var(--primary, #4318FF);
+      color: #fff;
+    }
+    @media (max-width: 600px) {
+      .auth-buttons { flex-direction: column; gap: 8px; }
+      .btn-auth { width: 100%; margin-left: 0; }
+    }
+    </style>
 </head>
 <body>
     <!-- Header Section -->
@@ -25,8 +59,8 @@
                     <li><a href="#why-choose-us">Neden Biz</a></li>
                 </ul>
                 <div class="auth-buttons">
-                    <a href="login.html" class="btn-text">Giriş Yap</a>
-                    <a href="signup.html" class="btn-primary">Kayıt Ol</a>
+                    <a href="login.html" class="btn-primary btn-auth">Giriş Yap</a>
+                    <a href="signup.html" class="btn-secondary btn-auth">Kayıt Ol</a>
                 </div>
             </nav>
         </div>
