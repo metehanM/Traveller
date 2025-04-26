@@ -28,16 +28,35 @@
     <h2 class="booking-title">Araç Kirala</h2>
     <form class="booking-form" id="booking-form">
       <div>
-        <label for="location">Konum</label>
-        <input type="text" id="location" placeholder="Konumunuzu girin" required>
+        <label for="city">Şehir</label>
+        <select id="city" required>
+          <option value="">Şehir seçin</option>
+          <option value="İstanbul">İstanbul</option>
+          <option value="Ankara">Ankara</option>
+          <option value="İzmir">İzmir</option>
+          <option value="Bursa">Bursa</option>
+          <option value="Antalya">Antalya</option>
+          <option value="Sivas">Sivas</option>
+          <option value="Konya">Konya</option>
+          <option value="Trabzon">Trabzon</option>
+          <option value="Gaziantep">Gaziantep</option>
+          <option value="Kayseri">Kayseri</option>
+        </select>
+      </div>
+      <div>
+        <label for="branch">Bayi</label>
+        <select id="branch" required>
+          <option value="">Bayi seçin</option>
+          <option value="Merkez">Merkez</option>
+        </select>
       </div>
       <div>
         <label for="pickup">Alış Tarihi</label>
-        <input type="datetime-local" id="pickup" required>
+        <input type="date" id="pickup" required>
       </div>
       <div>
         <label for="dropoff">İade Tarihi</label>
-        <input type="datetime-local" id="dropoff" required>
+        <input type="date" id="dropoff" required>
       </div>
     </form>
     <div class="car-list" id="car-list"></div>
@@ -67,17 +86,18 @@
     renderCars();
     // Sepete ekle fonksiyonu
     function addToCart(carId) {
-      const location = document.getElementById('location').value.trim();
+      const city = document.getElementById('city').value;
+      const branch = document.getElementById('branch').value;
       const pickup = document.getElementById('pickup').value;
       const dropoff = document.getElementById('dropoff').value;
-      if (!location || !pickup || !dropoff) {
-        alert('Lütfen konum ve tarihleri doldurun!');
+      if (!city || !branch || !pickup || !dropoff) {
+        alert('Lütfen şehir, bayi ve tarihleri doldurun!');
         return;
       }
       const car = cars.find(c => c.id === carId);
       if (!car) return;
       const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-      cart.push({car, location, pickup, dropoff});
+      cart.push({car, city, branch, pickup, dropoff});
       localStorage.setItem('cart', JSON.stringify(cart));
       alert('Araç sepete eklendi!');
     }
