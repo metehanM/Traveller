@@ -50,6 +50,22 @@
     input:checked + .slider:before { transform: translateX(20px); }
     .toast { position: fixed; top: -80px; left: 50%; transform: translateX(-50%); background: #4318FF; color: #fff; padding: 18px 36px; border-radius: 12px; font-size: 17px; font-weight: 500; box-shadow: 0 4px 24px rgba(67,24,255,0.12); z-index: 9999; opacity: 0; transition: top 0.5s, opacity 0.5s; }
     .toast.show { top: 32px; opacity: 1; }
+    .car-list { display: flex; flex-direction: column; gap: 20px; }
+    .car-card { display: flex; align-items: center; gap: 20px; background: #F4F7FE; border-radius: 14px; padding: 20px 24px; box-shadow: 0 2px 12px rgba(67,24,255,0.06); transition: background 0.3s, color 0.3s; }
+    .car-card img { width: 110px; height: 80px; border-radius: 10px; object-fit: cover; background: #fff; }
+    .car-info { flex: 1; }
+    .car-info h3 { margin: 0 0 8px 0; font-size: 18px; color: #222; }
+    .car-info span { color: #666; font-size: 15px; }
+    .btn-rent { background: #4318FF; color: #fff; border: none; border-radius: 8px; padding: 10px 24px; font-size: 16px; cursor: pointer; margin-top: 8px; transition: background 0.2s; }
+    .btn-rent:hover { background: #2d0fb2; }
+    .no-cars { text-align: center; color: #888; margin-top: 32px; font-size: 18px; }
+    .dark .car-card { background: #23242b; color: #fff; }
+    .dark .car-info h3, .dark .car-info span { color: #fff; }
+    .dark .btn-rent { background: #5a4fff; color: #fff; }
+    .dark .btn-rent:hover { background: #2d0fb2; }
+    .dark .no-cars { color: #bbb; }
+    select, textarea { font-family: inherit; font-size: 16px; border-radius: 8px; border: 1px solid #E6E8F0; padding: 10px; margin-bottom: 12px; }
+    .dark select, .dark textarea { background: #23242b; color: #fff; border: 1px solid #333; }
   </style>
 </head>
 <body>
@@ -400,13 +416,31 @@
     function fillCitySelect(cityId, districtId) {
       const citySelect = document.getElementById(cityId);
       const districtSelect = document.getElementById(districtId);
-      citySelect.innerHTML = '<option value="">Şehir seçin</option>' + window.TURKEY_CITIES.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+      citySelect.innerHTML = '';
+      const defaultOpt = document.createElement('option');
+      defaultOpt.value = '';
+      defaultOpt.textContent = 'Şehir seçin';
+      citySelect.appendChild(defaultOpt);
+      window.TURKEY_CITIES.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.name;
+        opt.textContent = c.name;
+        citySelect.appendChild(opt);
+      });
       citySelect.onchange = function() {
         const city = window.TURKEY_CITIES.find(c => c.name === citySelect.value);
+        districtSelect.innerHTML = '';
+        const defaultDist = document.createElement('option');
+        defaultDist.value = '';
+        defaultDist.textContent = 'İlçe seçin';
+        districtSelect.appendChild(defaultDist);
         if (city) {
-          districtSelect.innerHTML = '<option value="">İlçe seçin</option>' + city.districts.map(d => `<option value="${d}">${d}</option>`).join('');
-        } else {
-          districtSelect.innerHTML = '<option value="">İlçe seçin</option>';
+          city.districts.forEach(d => {
+            const opt = document.createElement('option');
+            opt.value = d;
+            opt.textContent = d;
+            districtSelect.appendChild(opt);
+          });
         }
       };
     }
