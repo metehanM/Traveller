@@ -21,6 +21,7 @@
     <div class="auth-page">
         <div class="auth-box">
             <h2>Giriş Yap</h2>
+            <div id="login-alert" style="display:none; background:#ffe6e6; color:#b30000; padding:10px 16px; border-radius:8px; margin-bottom:16px; text-align:center;"></div>
             <form class="auth-form" id="login-form">
                 <label for="login-email">E-posta</label>
                 <input type="email" id="login-email" placeholder="E-posta adresiniz" required>
@@ -46,6 +47,22 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
+    // Oturum kontrolü
+    auth.onAuthStateChanged(function(user) {
+      if (user) {
+        const alert = document.getElementById('login-alert');
+        alert.innerHTML = `Zaten giriş yaptınız.<br><button id='continue-btn' style='margin:8px 8px 0 0;padding:6px 18px;border-radius:6px;background:#4318FF;color:#fff;border:none;cursor:pointer;'>Devam Et</button><button id='logout-btn' style='margin:8px 0 0 0;padding:6px 18px;border-radius:6px;background:#ff4d4f;color:#fff;border:none;cursor:pointer;'>Çıkış Yap</button>`;
+        alert.style.display = 'block';
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('continue-btn').onclick = function() {
+          window.location.href = 'profile.html';
+        };
+        document.getElementById('logout-btn').onclick = function() {
+          auth.signOut().then(() => { window.location.reload(); });
+        };
+      }
+    });
+
     document.getElementById('login-form').onsubmit = async function(e) {
         e.preventDefault();
         var email = document.getElementById('login-email').value.trim();
@@ -53,8 +70,7 @@
         if(email && pass) {
             try {
                 await auth.signInWithEmailAndPassword(email, pass);
-                window.open('profile.html', '_blank');
-                window.close();
+                window.location.href = 'profile.html';
             } catch (error) {
                 alert(error.message);
             }

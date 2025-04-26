@@ -106,123 +106,10 @@
                 <span class="badge">POPÜLER KİRALAMA FIRSATLARI</span>
                 <h2>En popüler araç kiralama fırsatları</h2>
             </div>
-            <div class="car-grid">
-                <!-- Car Card 1 -->
-                <div class="car-card">
-                    <img src="assets/car1.jpg" alt="Jaguar XE L P250">
-                    <div class="car-info">
-                        <div class="car-header">
-                            <h3>Jaguar XE L P250</h3>
-                            <div class="rating">
-                                <i class="icon-star"></i>
-                                <span>4.8 (2.436 değerlendirme)</span>
-                            </div>
-                        </div>
-                        <div class="car-features">
-                            <div class="feature">
-                                <i class="icon-user"></i>
-                                <span>4 Yolcu</span>
-                            </div>
-                            <div class="feature">
-                                <i class="icon-transmission"></i>
-                                <span>Otomatik</span>
-                            </div>
-                            <div class="feature">
-                                <i class="icon-ac"></i>
-                                <span>Klima</span>
-                            </div>
-                            <div class="feature">
-                                <i class="icon-door"></i>
-                                <span>4 Kapı</span>
-                            </div>
-                        </div>
-                        <div class="car-footer">
-                            <div class="price">
-                                <span>Fiyat</span>
-                                <strong>1.800 ₺ /gün</strong>
-                            </div>
-                            <button class="btn-rent">Hemen Kirala</button>
-                        </div>
-                    </div>
-                </div>
-                <!-- Car Card 2 -->
-                <div class="car-card">
-                    <img src="assets/car2.jpg" alt="BMW 3 Serisi">
-                    <div class="car-info">
-                        <div class="car-header">
-                            <h3>BMW 3 Serisi</h3>
-                            <div class="rating">
-                                <i class="icon-star"></i>
-                                <span>4.9 (1.892 değerlendirme)</span>
-                            </div>
-                        </div>
-                        <div class="car-features">
-                            <div class="feature">
-                                <i class="icon-user"></i>
-                                <span>5 Yolcu</span>
-                            </div>
-                            <div class="feature">
-                                <i class="icon-transmission"></i>
-                                <span>Otomatik</span>
-                            </div>
-                            <div class="feature">
-                                <i class="icon-ac"></i>
-                                <span>Klima</span>
-                            </div>
-                            <div class="feature">
-                                <i class="icon-door"></i>
-                                <span>4 Kapı</span>
-                            </div>
-                        </div>
-                        <div class="car-footer">
-                            <div class="price">
-                                <span>Fiyat</span>
-                                <strong>1.500 ₺ /gün</strong>
-                            </div>
-                            <button class="btn-rent">Hemen Kirala</button>
-                        </div>
-                    </div>
-                </div>
-                <!-- Car Card 3 -->
-                <div class="car-card">
-                    <img src="assets/car3.jpg" alt="Mercedes-Benz C-Serisi">
-                    <div class="car-info">
-                        <div class="car-header">
-                            <h3>Mercedes-Benz C-Serisi</h3>
-                            <div class="rating">
-                                <i class="icon-star"></i>
-                                <span>4.7 (2.156 değerlendirme)</span>
-                            </div>
-                        </div>
-                        <div class="car-features">
-                            <div class="feature">
-                                <i class="icon-user"></i>
-                                <span>5 Yolcu</span>
-                            </div>
-                            <div class="feature">
-                                <i class="icon-transmission"></i>
-                                <span>Otomatik</span>
-                            </div>
-                            <div class="feature">
-                                <i class="icon-ac"></i>
-                                <span>Klima</span>
-                            </div>
-                            <div class="feature">
-                                <i class="icon-door"></i>
-                                <span>4 Kapı</span>
-                            </div>
-                        </div>
-                        <div class="car-footer">
-                            <div class="price">
-                                <span>Fiyat</span>
-                                <strong>1.600 ₺ /gün</strong>
-                            </div>
-                            <button class="btn-rent">Hemen Kirala</button>
-                        </div>
-                    </div>
-                </div>
+            <div class="car-grid" id="car-list">
+                <!-- Firestore'dan araçlar buraya gelecek -->
             </div>
-            <button class="btn-show-all">Tüm araçları göster</button>
+            <button class="btn-show-all" onclick="window.location.href='profile.html#section-findcar'">Tüm araçları göster</button>
         </div>
     </section>
 
@@ -393,38 +280,62 @@
 
     <!-- Profil Butonu ve Modal kaldırıldı -->
 
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script>
-    // Araçlar örnek veri
-    const cars = [
-      {id:1, name:'Jaguar XE L P250', price:1800, img:'assets/car1.jpg'},
-      {id:2, name:'BMW 3 Serisi', price:1500, img:'assets/car2.jpg'},
-      {id:3, name:'Mercedes-Benz C-Serisi', price:1600, img:'assets/car3.jpg'}
-    ];
-
-    // Sepete ekle fonksiyonu
-    function addToCart(carId) {
-      const location = document.querySelector('.search-item input[placeholder="Konumunuzu arayın"]').value.trim();
-      const pickup = document.querySelector('.search-item input[placeholder^="Sal"], .search-item input[placeholder^="Alış"]').value.trim();
-      const dropoff = document.querySelector('.search-item input[placeholder^="Per"], .search-item input[placeholder^="İade"]').value.trim();
-      if (!location || !pickup || !dropoff) {
-        alert('Lütfen konum ve tarihleri doldurun!');
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRArf2VPbZuvLueY2qm2Lz9GhQXLvhzxY",
+      authDomain: "rentcars-1077b.firebaseapp.com",
+      projectId: "rentcars-1077b",
+      storageBucket: "rentcars-1077b.appspot.com",
+      messagingSenderId: "564934399024",
+      appId: "1:564934399024:web:11dcb72be4d44e2a1709f5",
+      measurementId: "G-DMX2083TNQ"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    async function renderHomeCars() {
+      const carList = document.getElementById('car-list');
+      carList.innerHTML = '<div style="text-align:center;">Yükleniyor...</div>';
+      const snapshot = await db.collection('cars').orderBy('createdAt', 'desc').limit(6).get();
+      const cars = snapshot.docs.map(doc => doc.data());
+      if (!cars.length) {
+        carList.innerHTML = '<div style="text-align:center;">Henüz araç eklenmedi.</div>';
         return;
       }
-      const car = cars.find(c => c.id === carId);
-      if (!car) return;
-      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-      cart.push({car, location, pickup, dropoff});
-      localStorage.setItem('cart', JSON.stringify(cart));
-      alert('Araç sepete eklendi!');
+      carList.innerHTML = cars.map(car => `
+        <div class="car-card">
+          ${car.img ? `<img src="${car.img}" alt="${car.brand} ${car.model}">` : '<img src="assets/car1.jpg" alt="Araç">'}
+          <div class="car-info">
+            <div class="car-header">
+              <h3>${car.brand} ${car.model} (${car.year})</h3>
+              <div class="rating">
+                <i class="icon-star"></i>
+                <span>${car.gear} | ${car.city}, ${car.district}</span>
+              </div>
+            </div>
+            <div class="car-features">
+              <div class="feature"><i class="icon-user"></i> <span>5 Yolcu</span></div>
+              <div class="feature"><i class="icon-transmission"></i> <span>${car.gear}</span></div>
+              <div class="feature"><i class="icon-ac"></i> <span>Klima</span></div>
+              <div class="feature"><i class="icon-door"></i> <span>4 Kapı</span></div>
+            </div>
+            <div class="car-footer">
+              <div class="price">
+                <span>Fiyat</span>
+                <strong>${car.price} ₺ /gün</strong>
+              </div>
+              <a href="login.html" class="btn-rent">Hemen Kirala</a>
+            </div>
+          </div>
+        </div>
+      `).join('');
     }
-
-    // Tüm "Hemen Kirala" butonlarına event ekle
-    window.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.car-card').forEach((card, i) => {
-        const btn = card.querySelector('.btn-rent');
-        if (btn) btn.onclick = () => addToCart(cars[i].id);
-      });
-    });
+    renderHomeCars();
+    // Koyu tema desteği (örnek)
+    if (localStorage.getItem('theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+    }
     </script>
 </body>
 </html> 
