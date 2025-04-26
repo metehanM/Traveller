@@ -97,6 +97,10 @@
       const car = cars.find(c => c.id === carId);
       if (!car) return;
       const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      if (cart.some(item => item.car.id === carId)) {
+        alert('Bu araç zaten sepette!');
+        return;
+      }
       cart.push({car, city, branch, pickup, dropoff});
       localStorage.setItem('cart', JSON.stringify(cart));
       alert('Araç sepete eklendi!');
