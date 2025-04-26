@@ -125,15 +125,22 @@
         cartList.innerHTML = '<em>Sepetiniz boş.</em>';
         return;
       }
-      cartList.innerHTML = cart.map(item => `
-        <div class="cart-card">
+      cartList.innerHTML = cart.map((item, idx) => `
+        <div class=\"cart-card\">
           <strong>${item.car.name}</strong>
           <span>Şehir: ${item.city || '-'} | Bayi: ${item.branch || '-'}</span>
           <span>Alış: ${item.pickup}</span>
           <span>İade: ${item.dropoff}</span>
           <span>Fiyat: ${item.car.price} ₺/gün</span>
+          <button onclick=\"removeFromCart(${idx})\" style=\"margin-top:8px;background:#ff4d4f;color:#fff;border:none;border-radius:6px;padding:6px 16px;cursor:pointer;float:right;\">Kaldır</button>
         </div>
       `).join('');
+    }
+    function removeFromCart(idx) {
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      cart.splice(idx, 1);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      renderCart();
     }
     renderCart();
   </script>
