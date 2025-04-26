@@ -265,8 +265,15 @@
       if (tab === 'cart') { tabCart.classList.add('active'); sectionCart.classList.add('active'); renderCart(); }
       if (tab === 'payment') { tabPayment.classList.add('active'); sectionPayment.classList.add('active'); }
       if (tab === 'settings') { tabSettings.classList.add('active'); sectionSettings.classList.add('active'); }
-      if (tab === 'rentout') { tabRentout.classList.add('active'); sectionRentout.classList.add('active'); }
-      if (tab === 'findcar') { tabFindcar.classList.add('active'); sectionFindcar.classList.add('active'); renderFindCars(); }
+      if (tab === 'rentout') {
+        tabRentout.classList.add('active'); sectionRentout.classList.add('active');
+        fillCitySelect('car-city', 'car-district');
+      }
+      if (tab === 'findcar') {
+        tabFindcar.classList.add('active'); sectionFindcar.classList.add('active');
+        fillCitySelect('findcar-city', 'findcar-district');
+        renderFindCars();
+      }
     }
     tabProfile.onclick = () => setTab('profile');
     tabCart.onclick = () => setTab('cart');
@@ -416,6 +423,7 @@
     function fillCitySelect(cityId, districtId) {
       const citySelect = document.getElementById(cityId);
       const districtSelect = document.getElementById(districtId);
+      if (!citySelect || !districtSelect) return;
       citySelect.innerHTML = '';
       const defaultOpt = document.createElement('option');
       defaultOpt.value = '';
@@ -443,10 +451,15 @@
           });
         }
       };
+      // İlçe select'i de sıfırla
+      districtSelect.innerHTML = '';
+      const defaultDist = document.createElement('option');
+      defaultDist.value = '';
+      defaultDist.textContent = 'İlçe seçin';
+      districtSelect.appendChild(defaultDist);
     }
-    // Araç ekleme formu için uygula
+    // Sayfa yüklenince bir kez doldur
     fillCitySelect('car-city', 'car-district');
-    // Araç bulma formu için uygula
     fillCitySelect('findcar-city', 'findcar-district');
     // Araç bulma formunda şehir/ilçe değişince Firestore'dan çek
     ['findcar-city','findcar-district'].forEach(id => {
