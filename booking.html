@@ -15,12 +15,13 @@
     .booking-form input, .booking-form select { padding: 12px; border-radius: 8px; border: 1px solid #E6E8F0; font-size: 16px; }
     .car-list { display: flex; flex-direction: column; gap: 20px; }
     .car-card { display: flex; align-items: center; gap: 20px; background: #F4F7FE; border-radius: 12px; padding: 16px; }
-    .car-card img { width: 100px; border-radius: 8px; }
+    .car-card img { width: 100px; border-radius: 8px; object-fit: cover; }
     .car-info { flex: 1; }
     .car-info h3 { margin: 0 0 8px 0; }
     .car-info span { color: #888; font-size: 15px; }
     .btn-rent { background: #4318FF; color: #fff; border: none; border-radius: 8px; padding: 10px 24px; font-size: 16px; cursor: pointer; }
     .go-profile { display: block; text-align: center; margin: 32px 0 0 0; color: #4318FF; text-decoration: none; font-weight: 500; }
+    .no-cars { text-align: center; color: #888; margin-top: 32px; font-size: 18px; }
   </style>
 </head>
 <body>
@@ -29,26 +30,11 @@
     <form class="booking-form" id="booking-form">
       <div>
         <label for="city">Şehir</label>
-        <select id="city" required>
-          <option value="">Şehir seçin</option>
-          <option value="İstanbul">İstanbul</option>
-          <option value="Ankara">Ankara</option>
-          <option value="İzmir">İzmir</option>
-          <option value="Bursa">Bursa</option>
-          <option value="Antalya">Antalya</option>
-          <option value="Sivas">Sivas</option>
-          <option value="Konya">Konya</option>
-          <option value="Trabzon">Trabzon</option>
-          <option value="Gaziantep">Gaziantep</option>
-          <option value="Kayseri">Kayseri</option>
-        </select>
+        <input type="text" id="city" placeholder="Şehir seçin" required>
       </div>
       <div>
-        <label for="branch">Bayi</label>
-        <select id="branch" required>
-          <option value="">Bayi seçin</option>
-          <option value="Merkez">Merkez</option>
-        </select>
+        <label for="district">İlçe</label>
+        <input type="text" id="district" placeholder="İlçe seçin" required>
       </div>
       <div>
         <label for="pickup">Alış Tarihi</label>
@@ -60,51 +46,71 @@
       </div>
     </form>
     <div class="car-list" id="car-list"></div>
-    <a href="profile.html" class="go-profile">Sepetim & Profilim</a>
+    <div class="no-cars" id="no-cars" style="display:none;">Bölgenizde uygun araç bulunamadı.</div>
+    <a href="profile.html" class="go-profile">Profil Paneli</a>
   </div>
   <script>
-    // Araçlar örnek veri
-    const cars = [
-      {id:1, name:'Jaguar XE L P250', price:1800, img:'assets/car1.jpg'},
-      {id:2, name:'BMW 3 Serisi', price:1500, img:'assets/car2.jpg'},
-      {id:3, name:'Mercedes-Benz C-Serisi', price:1600, img:'assets/car3.jpg'}
-    ];
-    // Araçları listele
+    // Araçları filtrele ve listele
     function renderCars() {
+      const city = document.getElementById('city').value.trim().toLowerCase();
+      const district = document.getElementById('district').value.trim().toLowerCase();
       const carList = document.getElementById('car-list');
-      carList.innerHTML = cars.map(car => `
+      const noCars = document.getElementById('no-cars');
+      const cars = JSON.parse(localStorage.getItem('cars') || '[]');
+      let filtered = cars.filter(car =>
+        (car.city && car.city.toLowerCase() === city && car.district && car.district.toLowerCase() === district)
+      );
+      // Eğer ilçe yoksa şehirdeki araçları göster
+      if (filtered.length === 0 && city) {
+        filtered = cars.filter(car => car.city && car.city.toLowerCase() === city);
+      }
+      if (!city) filtered = [];
+      if (filtered.length === 0) {
+        carList.innerHTML = '';
+        noCars.style.display = 'block';
+        return;
+      }
+      noCars.style.display = 'none';
+      carList.innerHTML = filtered.map((car, i) => `
         <div class="car-card">
-          <img src="${car.img}" alt="${car.name}">
+          ${car.img ? `<img src="${car.img}" alt="${car.brand} ${car.model}">` : ''}
           <div class="car-info">
-            <h3>${car.name}</h3>
-            <span>Fiyat: ${car.price} ₺/gün</span>
+            <h3>${car.brand} ${car.model} (${car.year})</h3>
+            <span>${car.gear} | ${car.city}, ${car.district}</span><br>
+            <span>Fiyat: ${car.price} ₺/gün</span><br>
+            <span>${car.desc || ''}</span>
           </div>
-          <button class="btn-rent" onclick="addToCart(${car.id})">Sepete Ekle</button>
+          <button class="btn-rent" onclick="addToCart(${i})">Sepete Ekle</button>
         </div>
       `).join('');
     }
-    renderCars();
     // Sepete ekle fonksiyonu
-    function addToCart(carId) {
-      const city = document.getElementById('city').value;
-      const branch = document.getElementById('branch').value;
+    function addToCart(carIdx) {
+      const city = document.getElementById('city').value.trim();
+      const district = document.getElementById('district').value.trim();
       const pickup = document.getElementById('pickup').value;
       const dropoff = document.getElementById('dropoff').value;
-      if (!city || !branch || !pickup || !dropoff) {
-        alert('Lütfen şehir, bayi ve tarihleri doldurun!');
+      if (!city || !district || !pickup || !dropoff) {
+        alert('Lütfen şehir, ilçe ve tarihleri doldurun!');
         return;
       }
-      const car = cars.find(c => c.id === carId);
+      const cars = JSON.parse(localStorage.getItem('cars') || '[]');
+      const car = cars[carIdx];
       if (!car) return;
       const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-      if (cart.some(item => item.car.id === carId)) {
+      if (cart.some(item => item.car.brand === car.brand && item.car.model === car.model && item.car.city === car.city && item.car.district === car.district)) {
         alert('Bu araç zaten sepette!');
         return;
       }
-      cart.push({car, city, branch, pickup, dropoff});
+      cart.push({car, city, district, pickup, dropoff});
       localStorage.setItem('cart', JSON.stringify(cart));
       alert('Araç sepete eklendi!');
     }
+    // Form değişince araçları filtrele
+    document.getElementById('city').oninput = renderCars;
+    document.getElementById('district').oninput = renderCars;
+    // İlk yüklemede boş liste
+    renderCars();
   </script>
 </body>
 </html> 
