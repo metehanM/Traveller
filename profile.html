@@ -62,9 +62,12 @@
         <button class="nav-btn" id="tab-cart">Araç Sepetim</button>
         <button class="nav-btn" id="tab-payment">Ödeme Bilgileri</button>
         <button class="nav-btn" id="tab-settings">Ayarlar</button>
+        <button class="nav-btn" id="tab-rentout">Aracını Kiraya Ver</button>
+        <button class="nav-btn" id="tab-findcar">Araç Bul</button>
       </div>
       <div class="logout">
         <button class="logout-btn" id="logout-btn">Çıkış Yap</button>
+        <a href="booking.html" class="btn-primary" style="margin-top:16px;display:block;text-align:center;">Araç Kirala</a>
       </div>
     </aside>
     <main class="panel-content">
@@ -103,6 +106,57 @@
           </label>
         </div>
       </section>
+      <section class="panel-section" id="section-rentout">
+        <h2>Aracını Kiraya Ver</h2>
+        <form id="rentout-form" class="settings-section" enctype="multipart/form-data">
+          <label>Marka</label>
+          <input type="text" id="car-brand" required>
+          <label>Model</label>
+          <input type="text" id="car-model" required>
+          <label>Yıl</label>
+          <input type="number" id="car-year" min="1980" max="2024" required>
+          <label>Şehir</label>
+          <input type="text" id="car-city" required>
+          <label>İlçe</label>
+          <input type="text" id="car-district" required>
+          <label>Fiyat (₺/gün)</label>
+          <input type="number" id="car-price" min="1" required>
+          <label>Açıklama</label>
+          <textarea id="car-desc" rows="2"></textarea>
+          <label>Vites Tipi</label>
+          <select id="car-gear" required>
+            <option value="">Seçiniz</option>
+            <option value="Otomatik">Otomatik</option>
+            <option value="Manuel">Manuel</option>
+          </select>
+          <label>Fotoğraf (isteğe bağlı)</label>
+          <input type="file" id="car-img" accept="image/*">
+          <button class="btn-primary" type="submit" style="margin-top:16px;">Aracı Ekle</button>
+        </form>
+      </section>
+      <section class="panel-section" id="section-findcar">
+        <h2>Araç Bul</h2>
+        <form class="booking-form" id="findcar-form">
+          <div>
+            <label for="findcar-city">Şehir</label>
+            <input type="text" id="findcar-city" placeholder="Şehir seçin" required>
+          </div>
+          <div>
+            <label for="findcar-district">İlçe</label>
+            <input type="text" id="findcar-district" placeholder="İlçe seçin" required>
+          </div>
+          <div>
+            <label for="findcar-pickup">Alış Tarihi</label>
+            <input type="date" id="findcar-pickup" required>
+          </div>
+          <div>
+            <label for="findcar-dropoff">İade Tarihi</label>
+            <input type="date" id="findcar-dropoff" required>
+          </div>
+        </form>
+        <div class="car-list" id="findcar-list"></div>
+        <div class="no-cars" id="findcar-nocars" style="display:none;">Bölgenizde uygun araç bulunamadı.</div>
+      </section>
     </main>
   </div>
   <div class="toast" id="toast"></div>
@@ -133,10 +187,14 @@
     const tabCart = document.getElementById('tab-cart');
     const tabPayment = document.getElementById('tab-payment');
     const tabSettings = document.getElementById('tab-settings');
+    const tabRentout = document.getElementById('tab-rentout');
+    const tabFindcar = document.getElementById('tab-findcar');
     const sectionProfile = document.getElementById('section-profile');
     const sectionCart = document.getElementById('section-cart');
     const sectionPayment = document.getElementById('section-payment');
     const sectionSettings = document.getElementById('section-settings');
+    const sectionRentout = document.getElementById('section-rentout');
+    const sectionFindcar = document.getElementById('section-findcar');
     // Toast
     const toast = document.getElementById('toast');
     function showToast(msg) {
@@ -174,17 +232,21 @@
     });
     // Sekme geçişleri
     function setTab(tab) {
-      [tabProfile, tabCart, tabPayment, tabSettings].forEach(btn => btn.classList.remove('active'));
-      [sectionProfile, sectionCart, sectionPayment, sectionSettings].forEach(sec => sec.classList.remove('active'));
+      [tabProfile, tabCart, tabPayment, tabSettings, tabRentout, tabFindcar].forEach(btn => btn.classList.remove('active'));
+      [sectionProfile, sectionCart, sectionPayment, sectionSettings, sectionRentout, sectionFindcar].forEach(sec => sec.classList.remove('active'));
       if (tab === 'profile') { tabProfile.classList.add('active'); sectionProfile.classList.add('active'); }
       if (tab === 'cart') { tabCart.classList.add('active'); sectionCart.classList.add('active'); renderCart(); }
       if (tab === 'payment') { tabPayment.classList.add('active'); sectionPayment.classList.add('active'); }
       if (tab === 'settings') { tabSettings.classList.add('active'); sectionSettings.classList.add('active'); }
+      if (tab === 'rentout') { tabRentout.classList.add('active'); sectionRentout.classList.add('active'); }
+      if (tab === 'findcar') { tabFindcar.classList.add('active'); sectionFindcar.classList.add('active'); renderFindCars(); }
     }
     tabProfile.onclick = () => setTab('profile');
     tabCart.onclick = () => setTab('cart');
     tabPayment.onclick = () => setTab('payment');
     tabSettings.onclick = () => setTab('settings');
+    tabRentout.onclick = () => setTab('rentout');
+    tabFindcar.onclick = () => setTab('findcar');
     // Profil düzenleme
     editForm.onsubmit = async (e) => {
       e.preventDefault();
@@ -236,6 +298,100 @@
     }
     // İlk yüklemede profil sekmesi aktif olsun
     setTab('profile');
+    // Aracını Kiraya Ver formu
+    const rentoutForm = document.getElementById('rentout-form');
+    rentoutForm.onsubmit = async function(e) {
+      e.preventDefault();
+      const brand = document.getElementById('car-brand').value.trim();
+      const model = document.getElementById('car-model').value.trim();
+      const year = document.getElementById('car-year').value.trim();
+      const city = document.getElementById('car-city').value.trim();
+      const district = document.getElementById('car-district').value.trim();
+      const price = document.getElementById('car-price').value.trim();
+      const desc = document.getElementById('car-desc').value.trim();
+      const gear = document.getElementById('car-gear').value;
+      const imgInput = document.getElementById('car-img');
+      let imgData = '';
+      if (imgInput.files && imgInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          imgData = evt.target.result;
+          saveCar();
+        };
+        reader.readAsDataURL(imgInput.files[0]);
+      } else {
+        saveCar();
+      }
+      function saveCar() {
+        const car = { brand, model, year, city, district, price, desc, gear, img: imgData };
+        const cars = JSON.parse(localStorage.getItem('cars') || '[]');
+        cars.push(car);
+        localStorage.setItem('cars', JSON.stringify(cars));
+        showToast('Araç başarıyla eklendi!');
+        rentoutForm.reset();
+      }
+    };
+    // Araç Bul sekmesi fonksiyonları
+    function renderFindCars() {
+      const city = document.getElementById('findcar-city').value.trim().toLowerCase();
+      const district = document.getElementById('findcar-district').value.trim().toLowerCase();
+      const carList = document.getElementById('findcar-list');
+      const noCars = document.getElementById('findcar-nocars');
+      const cars = JSON.parse(localStorage.getItem('cars') || '[]');
+      let filtered = cars.filter(car =>
+        (car.city && car.city.toLowerCase() === city && car.district && car.district.toLowerCase() === district)
+      );
+      if (filtered.length === 0 && city) {
+        filtered = cars.filter(car => car.city && car.city.toLowerCase() === city);
+      }
+      if (!city) filtered = [];
+      if (filtered.length === 0) {
+        carList.innerHTML = '';
+        noCars.style.display = 'block';
+        return;
+      }
+      noCars.style.display = 'none';
+      carList.innerHTML = filtered.map((car, i) => `
+        <div class=\"car-card\">
+          ${car.img ? `<img src=\"${car.img}\" alt=\"${car.brand} ${car.model}\">` : ''}
+          <div class=\"car-info\">
+            <h3>${car.brand} ${car.model} (${car.year})</h3>
+            <span>${car.gear} | ${car.city}, ${car.district}</span><br>
+            <span>Fiyat: ${car.price} ₺/gün</span><br>
+            <span>${car.desc || ''}</span>
+          </div>
+          <button class=\"btn-rent\" onclick=\"addToCartFromFind(${i})\">Sepete Ekle</button>
+        </div>
+      `).join('');
+    }
+    function addToCartFromFind(carIdx) {
+      const city = document.getElementById('findcar-city').value.trim();
+      const district = document.getElementById('findcar-district').value.trim();
+      const pickup = document.getElementById('findcar-pickup').value;
+      const dropoff = document.getElementById('findcar-dropoff').value;
+      if (!city || !district || !pickup || !dropoff) {
+        showToast('Lütfen şehir, ilçe ve tarihleri doldurun!');
+        return;
+      }
+      const cars = JSON.parse(localStorage.getItem('cars') || '[]');
+      const car = cars[carIdx];
+      if (!car) return;
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      if (cart.some(item => item.car.brand === car.brand && item.car.model === car.model && item.car.city === car.city && item.car.district === car.district)) {
+        showToast('Bu araç zaten sepette!');
+        return;
+      }
+      cart.push({car, city, district, pickup, dropoff});
+      localStorage.setItem('cart', JSON.stringify(cart));
+      showToast('Araç sepete eklendi!');
+    }
+    // Form değişince araçları filtrele
+    document.addEventListener('DOMContentLoaded', function() {
+      ['findcar-city','findcar-district'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.oninput = renderFindCars;
+      });
+    });
   </script>
 </body>
 </html> 
