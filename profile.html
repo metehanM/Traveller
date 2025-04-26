@@ -116,9 +116,13 @@
           <label>Yıl</label>
           <input type="number" id="car-year" min="1980" max="2024" required>
           <label>Şehir</label>
-          <input type="text" id="car-city" required>
+          <select id="car-city" required>
+            <option value="">Şehir seçin</option>
+          </select>
           <label>İlçe</label>
-          <input type="text" id="car-district" required>
+          <select id="car-district" required>
+            <option value="">İlçe seçin</option>
+          </select>
           <label>Fiyat (₺/gün)</label>
           <input type="number" id="car-price" min="1" required>
           <label>Açıklama</label>
@@ -139,11 +143,15 @@
         <form class="booking-form" id="findcar-form">
           <div>
             <label for="findcar-city">Şehir</label>
-            <input type="text" id="findcar-city" placeholder="Şehir seçin" required>
+            <select id="findcar-city" required>
+              <option value="">Şehir seçin</option>
+            </select>
           </div>
           <div>
             <label for="findcar-district">İlçe</label>
-            <input type="text" id="findcar-district" placeholder="İlçe seçin" required>
+            <select id="findcar-district" required>
+              <option value="">İlçe seçin</option>
+            </select>
           </div>
           <div>
             <label for="findcar-pickup">Alış Tarihi</label>
@@ -162,6 +170,8 @@
   <div class="toast" id="toast"></div>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="sehir-ilce-data.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCRArf2VPbZuvLueY2qm2Lz9GhQXLvhzxY",
@@ -174,6 +184,7 @@
     };
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
+    const db = firebase.firestore();
     // Sidebar ve kullanıcı bilgileri
     const nameEl = document.getElementById('profile-name');
     const avatarEl = document.getElementById('profile-avatar');
@@ -305,8 +316,8 @@
       const brand = document.getElementById('car-brand').value.trim();
       const model = document.getElementById('car-model').value.trim();
       const year = document.getElementById('car-year').value.trim();
-      const city = document.getElementById('car-city').value.trim();
-      const district = document.getElementById('car-district').value.trim();
+      const city = document.getElementById('car-city').value;
+      const district = document.getElementById('car-district').value;
       const price = document.getElementById('car-price').value.trim();
       const desc = document.getElementById('car-desc').value.trim();
       const gear = document.getElementById('car-gear').value;
@@ -322,28 +333,28 @@
       } else {
         saveCar();
       }
-      function saveCar() {
-        const car = { brand, model, year, city, district, price, desc, gear, img: imgData };
-        const cars = JSON.parse(localStorage.getItem('cars') || '[]');
-        cars.push(car);
-        localStorage.setItem('cars', JSON.stringify(cars));
-        showToast('Araç başarıyla eklendi!');
-        rentoutForm.reset();
+      async function saveCar() {
+        try {
+          await db.collection('cars').add({ brand, model, year, city, district, price, desc, gear, img: imgData, createdAt: new Date() });
+          showToast('Araç başarıyla eklendi!');
+          rentoutForm.reset();
+        } catch (err) {
+          showToast('Hata: ' + err.message);
+        }
       }
     };
     // Araç Bul sekmesi fonksiyonları
-    function renderFindCars() {
-      const city = document.getElementById('findcar-city').value.trim().toLowerCase();
-      const district = document.getElementById('findcar-district').value.trim().toLowerCase();
+    async function renderFindCars() {
+      const city = document.getElementById('findcar-city').value;
+      const district = document.getElementById('findcar-district').value;
       const carList = document.getElementById('findcar-list');
       const noCars = document.getElementById('findcar-nocars');
-      const cars = JSON.parse(localStorage.getItem('cars') || '[]');
-      let filtered = cars.filter(car =>
-        (car.city && car.city.toLowerCase() === city && car.district && car.district.toLowerCase() === district)
-      );
-      if (filtered.length === 0 && city) {
-        filtered = cars.filter(car => car.city && car.city.toLowerCase() === city);
-      }
+      let query = db.collection('cars');
+      if (city) query = query.where('city', '==', city);
+      if (district) query = query.where('district', '==', district);
+      const snapshot = await query.get();
+      const cars = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      let filtered = cars;
       if (!city) filtered = [];
       if (filtered.length === 0) {
         carList.innerHTML = '';
@@ -360,38 +371,56 @@
             <span>Fiyat: ${car.price} ₺/gün</span><br>
             <span>${car.desc || ''}</span>
           </div>
-          <button class=\"btn-rent\" onclick=\"addToCartFromFind(${i})\">Sepete Ekle</button>
+          <button class=\"btn-rent\" onclick=\"addToCartFromFindFirestore('${car.id}')\">Sepete Ekle</button>
         </div>
       `).join('');
     }
-    function addToCartFromFind(carIdx) {
-      const city = document.getElementById('findcar-city').value.trim();
-      const district = document.getElementById('findcar-district').value.trim();
+    window.addToCartFromFindFirestore = async function(carId) {
+      const city = document.getElementById('findcar-city').value;
+      const district = document.getElementById('findcar-district').value;
       const pickup = document.getElementById('findcar-pickup').value;
       const dropoff = document.getElementById('findcar-dropoff').value;
       if (!city || !district || !pickup || !dropoff) {
         showToast('Lütfen şehir, ilçe ve tarihleri doldurun!');
         return;
       }
-      const cars = JSON.parse(localStorage.getItem('cars') || '[]');
-      const car = cars[carIdx];
+      const doc = await db.collection('cars').doc(carId).get();
+      const car = doc.data();
       if (!car) return;
-      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-      if (cart.some(item => item.car.brand === car.brand && item.car.model === car.model && item.car.city === car.city && item.car.district === car.district)) {
+      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      if (cart.some(item => item.carId === carId)) {
         showToast('Bu araç zaten sepette!');
         return;
       }
-      cart.push({car, city, district, pickup, dropoff});
+      cart.push({carId, car, city, district, pickup, dropoff});
       localStorage.setItem('cart', JSON.stringify(cart));
       showToast('Araç sepete eklendi!');
+    };
+    // Araç ekleme ve bulma formlarında şehir/ilçe select menüleri
+    function fillCitySelect(cityId, districtId) {
+      const citySelect = document.getElementById(cityId);
+      const districtSelect = document.getElementById(districtId);
+      citySelect.innerHTML = '<option value="">Şehir seçin</option>' + window.TURKEY_CITIES.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+      citySelect.onchange = function() {
+        const city = window.TURKEY_CITIES.find(c => c.name === citySelect.value);
+        if (city) {
+          districtSelect.innerHTML = '<option value="">İlçe seçin</option>' + city.districts.map(d => `<option value="${d}">${d}</option>`).join('');
+        } else {
+          districtSelect.innerHTML = '<option value="">İlçe seçin</option>';
+        }
+      };
     }
-    // Form değişince araçları filtrele
-    document.addEventListener('DOMContentLoaded', function() {
-      ['findcar-city','findcar-district'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.oninput = renderFindCars;
-      });
+    // Araç ekleme formu için uygula
+    fillCitySelect('car-city', 'car-district');
+    // Araç bulma formu için uygula
+    fillCitySelect('findcar-city', 'findcar-district');
+    // Araç bulma formunda şehir/ilçe değişince Firestore'dan çek
+    ['findcar-city','findcar-district'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.onchange = renderFindCars;
     });
+    // Sayfa ilk açıldığında araçları çek
+    renderFindCars();
   </script>
 </body>
 </html> 
