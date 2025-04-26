@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profilim | Traveller</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .profile-container { max-width: 420px; margin: 48px auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(67,24,255,0.08); padding: 40px 32px; }
+    .profile-title { text-align: center; margin-bottom: 24px; }
+    .profile-info { margin-bottom: 32px; }
+    .profile-info label { font-weight: 500; display: block; margin-bottom: 4px; }
+    .profile-info input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #E6E8F0; margin-bottom: 16px; font-size: 16px; }
+    .profile-actions { display: flex; flex-direction: column; gap: 12px; }
+    .btn-primary { background: #4318FF; color: #fff; border: none; border-radius: 8px; padding: 12px; font-size: 16px; cursor: pointer; }
+    .btn-secondary { background: #eee; color: #4318FF; border: none; border-radius: 8px; padding: 12px; font-size: 16px; cursor: pointer; }
+    .profile-logout { margin-top: 24px; text-align: center; }
+    .profile-logout button { background: #ff4d4f; color: #fff; border: none; border-radius: 8px; padding: 10px 24px; font-size: 16px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="profile-container">
+    <h2 class="profile-title">Profilim</h2>
+    <div class="profile-info">
+      <label for="profile-email">E-posta</label>
+      <input type="email" id="profile-email" disabled>
+      <label for="profile-name">Ad Soyad</label>
+      <input type="text" id="profile-name">
+      <label for="profile-password">Yeni Şifre</label>
+      <input type="password" id="profile-password" placeholder="Şifreyi değiştirmek için doldurun">
+    </div>
+    <div class="profile-actions">
+      <button class="btn-primary" id="save-profile">Kaydet</button>
+      <a href="index.html" class="btn-secondary" style="text-align:center;">Ana Sayfa</a>
+    </div>
+    <div style="margin:32px 0 0 0;">
+      <h3 style="margin-bottom:12px;">Sepetiniz / Kiralama Geçmişiniz</h3>
+      <div id="cart-list"></div>
+    </div>
+    <div class="profile-logout">
+      <button id="logout-btn">Çıkış Yap</button>
+    </div>
+  </div>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRArf2VPbZuvLueY2qm2Lz9GhQXLvhzxY",
+      authDomain: "rentcars-1077b.firebaseapp.com",
+      projectId: "rentcars-1077b",
+      storageBucket: "rentcars-1077b.appspot.com",
+      messagingSenderId: "564934399024",
+      appId: "1:564934399024:web:11dcb72be4d44e2a1709f5",
+      measurementId: "G-DMX2083TNQ"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const emailInput = document.getElementById('profile-email');
+    const nameInput = document.getElementById('profile-name');
+    const passwordInput = document.getElementById('profile-password');
+    const saveBtn = document.getElementById('save-profile');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        emailInput.value = user.email;
+        nameInput.value = user.displayName || '';
+      } else {
+        window.location.href = 'login.html';
+      }
+    });
+
+    saveBtn.onclick = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+      const newName = nameInput.value.trim();
+      const newPassword = passwordInput.value.trim();
+      try {
+        if (newName && newName !== user.displayName) {
+          await user.updateProfile({ displayName: newName });
+        }
+        if (newPassword.length >= 6) {
+          await user.updatePassword(newPassword);
+        }
+        alert('Profil güncellendi!');
+        passwordInput.value = '';
+      } catch (err) {
+        alert('Hata: ' + err.message);
+      }
+    };
+
+    logoutBtn.onclick = () => {
+      auth.signOut().then(() => { window.location.href = 'login.html'; });
+    };
+
+    // Sepet/kiralama geçmişini göster
+    function renderCart() {
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const cartList = document.getElementById('cart-list');
+      if (!cart.length) {
+        cartList.innerHTML = '<em>Sepetiniz boş.</em>';
+        return;
+      }
+      cartList.innerHTML = cart.map(item => `
+        <div style="border:1px solid #eee;border-radius:8px;padding:12px;margin-bottom:10px;">
+          <strong>${item.car.name}</strong><br>
+          <span>Konum: ${item.location}</span><br>
+          <span>Alış: ${item.pickup}</span><br>
+          <span>İade: ${item.dropoff}</span><br>
+          <span>Fiyat: ${item.car.price} ₺/gün</span>
+        </div>
+      `).join('');
+    }
+    renderCart();
+  </script>
+</body>
+</html> 
