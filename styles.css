@@ -1,0 +1,538 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #2B3674;
+    --secondary-color: #4318FF;
+    --text-color: #2B3674;
+    --light-text: #707EAE;
+    --white: #FFFFFF;
+    --background: #F4F7FE;
+    --border-color: #E6E8F0;
+    --success-color: #05CD99;
+    --shadow: 0px 18px 40px rgba(112, 144, 176, 0.12);
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-color);
+    line-height: 1.5;
+    background-color: var(--background);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Typography */
+h1 {
+    font-size: 48px;
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 16px;
+}
+
+h2 {
+    font-size: 36px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 16px;
+}
+
+h3 {
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+p {
+    color: var(--light-text);
+    margin-bottom: 16px;
+}
+
+/* Header Styles */
+.header {
+    background-color: var(--white);
+    padding: 20px 0;
+    box-shadow: var(--shadow);
+}
+
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logo img {
+    height: 32px;
+}
+
+.logo span {
+    font-weight: 600;
+    font-size: 20px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+}
+
+.nav-links a {
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.btn-text {
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background-color: var(--secondary-color);
+    color: var(--white);
+    padding: 12px 24px;
+    border-radius: 16px;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* Hero Section */
+.hero {
+    padding: 80px 0;
+    background-color: var(--white);
+}
+
+.hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.search-box {
+    display: flex;
+    gap: 16px;
+    background-color: var(--white);
+    padding: 24px;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    margin-top: 40px;
+}
+
+.search-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.search-item label {
+    display: block;
+    color: var(--light-text);
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.search-item input {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 16px;
+}
+
+.btn-search {
+    background-color: var(--secondary-color);
+    color: var(--white);
+    border: none;
+    padding: 0 32px;
+    border-radius: 16px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* Section Styles */
+.section-header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.badge {
+    display: inline-block;
+    background-color: rgba(67, 24, 255, 0.1);
+    color: var(--secondary-color);
+    padding: 8px 16px;
+    border-radius: 16px;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 16px;
+}
+
+/* How It Works Section */
+.how-it-works {
+    padding: 80px 0;
+    background-color: var(--background);
+}
+
+.steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+}
+
+.step {
+    text-align: center;
+    padding: 32px;
+    background-color: var(--white);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+}
+
+.step-icon {
+    width: 64px;
+    height: 64px;
+    background-color: rgba(67, 24, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+}
+
+/* Rental Deals Section */
+.rental-deals {
+    padding: 80px 0;
+    background-color: var(--white);
+}
+
+.car-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 32px;
+    margin-bottom: 40px;
+}
+
+.car-card {
+    background-color: var(--white);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+.car-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.car-info {
+    padding: 24px;
+}
+
+.car-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--light-text);
+}
+
+.car-features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.feature {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--light-text);
+}
+
+.car-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+}
+
+.price span {
+    display: block;
+    color: var(--light-text);
+    font-size: 14px;
+}
+
+.price strong {
+    color: var(--secondary-color);
+    font-size: 20px;
+}
+
+.btn-rent {
+    background-color: var(--secondary-color);
+    color: var(--white);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 16px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-show-all {
+    display: block;
+    margin: 0 auto;
+    background-color: transparent;
+    color: var(--secondary-color);
+    border: 2px solid var(--secondary-color);
+    padding: 12px 32px;
+    border-radius: 16px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* Why Choose Us Section */
+.why-choose-us {
+    padding: 80px 0;
+    background-color: var(--background);
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 32px;
+}
+
+.feature-card {
+    background-color: var(--white);
+    padding: 32px;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+}
+
+.feature-icon {
+    width: 48px;
+    height: 48px;
+    background-color: rgba(67, 24, 255, 0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+/* Testimonials Section */
+.testimonials {
+    padding: 80px 0;
+    background-color: var(--white);
+}
+
+.testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 32px;
+}
+
+.testimonial-card {
+    background-color: var(--white);
+    padding: 32px;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+}
+
+.stars {
+    display: flex;
+    gap: 4px;
+    color: var(--success-color);
+}
+
+.quote {
+    font-style: italic;
+    margin: 16px 0;
+}
+
+.author h4 {
+    margin-bottom: 4px;
+}
+
+.author span {
+    color: var(--light-text);
+}
+
+/* Download App Section */
+.download-app {
+    padding: 80px 0;
+    background-color: var(--background);
+}
+
+.download-app .container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: center;
+}
+
+.app-buttons {
+    display: flex;
+    gap: 16px;
+    margin-top: 32px;
+}
+
+.app-buttons img {
+    height: 48px;
+}
+
+.app-preview img {
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Footer */
+.footer {
+    background-color: var(--white);
+    padding: 80px 0 40px;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 64px;
+    margin-bottom: 64px;
+}
+
+.footer-column h3 {
+    margin-bottom: 24px;
+}
+
+.footer-column ul {
+    list-style: none;
+}
+
+.footer-column li {
+    margin-bottom: 12px;
+}
+
+.footer-column a {
+    color: var(--light-text);
+    text-decoration: none;
+}
+
+.social-links {
+    display: flex;
+    gap: 16px;
+}
+
+.social-link {
+    width: 40px;
+    height: 40px;
+    background-color: var(--background);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.footer-bottom {
+    padding-top: 40px;
+    border-top: 1px solid var(--border-color);
+}
+
+.footer-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 32px;
+}
+
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--light-text);
+}
+
+.copyright {
+    text-align: center;
+    color: var(--light-text);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .search-box {
+        flex-direction: column;
+    }
+    
+    .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+    }
+    
+    .steps {
+        grid-template-columns: 1fr;
+    }
+    
+    .download-app .container {
+        grid-template-columns: 1fr;
+    }
+    
+    .footer-info {
+        flex-direction: column;
+        gap: 32px;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 36px;
+    }
+    
+    h2 {
+        font-size: 28px;
+    }
+    
+    .car-features {
+        grid-template-columns: 1fr;
+    }
+    
+    .footer-grid {
+        grid-template-columns: 1fr;
+    }
+} 
