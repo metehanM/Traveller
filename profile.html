@@ -7,28 +7,47 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <style>
-    body { background: #F4F7FE; }
+    body { background: #F4F7FE; transition: background 0.3s; }
+    .dark body { background: #181A20; }
     .panel-root { display: flex; min-height: 100vh; }
-    .sidebar { width: 220px; background: #fff; border-radius: 0 24px 24px 0; box-shadow: 2px 0 16px rgba(67,24,255,0.06); padding: 40px 0 0 0; display: flex; flex-direction: column; align-items: center; }
+    .sidebar { width: 220px; background: #fff; border-radius: 0 24px 24px 0; box-shadow: 2px 0 16px rgba(67,24,255,0.06); padding: 40px 0 0 0; display: flex; flex-direction: column; align-items: center; transition: background 0.3s; }
+    .dark .sidebar { background: #23242b; }
     .sidebar .avatar { width: 64px; height: 64px; border-radius: 50%; background: #eee; display: flex; align-items: center; justify-content: center; font-size: 32px; color: #4318FF; font-weight: 600; margin-bottom: 16px; }
-    .sidebar .name { font-size: 18px; font-weight: 600; margin-bottom: 32px; }
-    .sidebar .nav { width: 100%; }
-    .sidebar .nav-btn { width: 100%; background: none; border: none; text-align: left; padding: 16px 32px; font-size: 16px; color: #4318FF; cursor: pointer; border-left: 4px solid transparent; transition: background 0.2s, border-color 0.2s; }
+    .dark .sidebar .avatar { background: #23242b; color: #fff; }
+    .sidebar .name { font-size: 18px; font-weight: 600; margin-bottom: 32px; color: #222; }
+    .dark .sidebar .name { color: #fff; }
+    .sidebar .nav { width: 100%; display: flex; flex-direction: column; gap: 0; }
+    .sidebar .nav-btn { width: 100%; background: none; border: none; text-align: left; padding: 16px 32px; font-size: 16px; color: #4318FF; cursor: pointer; border-left: 4px solid transparent; transition: background 0.2s, border-color 0.2s, color 0.3s; }
     .sidebar .nav-btn.active, .sidebar .nav-btn:hover { background: #F4F7FE; border-left: 4px solid #4318FF; }
+    .dark .sidebar .nav-btn { color: #fff; }
+    .dark .sidebar .nav-btn.active, .dark .sidebar .nav-btn:hover { background: #23242b; border-left: 4px solid #fff; }
     .sidebar .logout { margin-top: auto; margin-bottom: 32px; }
     .sidebar .logout-btn { background: #ff4d4f; color: #fff; border: none; border-radius: 8px; padding: 10px 24px; font-size: 16px; cursor: pointer; width: 80%; margin-left: 10%; }
-    .panel-content { flex: 1; padding: 48px 40px; }
+    .panel-content { flex: 1; padding: 48px 40px; transition: background 0.3s, color 0.3s; }
+    .dark .panel-content { background: #181A20; color: #fff; }
     .panel-section { display: none; max-width: 520px; margin: 0 auto; }
     .panel-section.active { display: block; }
     .profile-edit label { font-weight: 500; display: block; margin-bottom: 4px; }
-    .profile-edit input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #E6E8F0; margin-bottom: 16px; font-size: 16px; }
+    .profile-edit input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #E6E8F0; margin-bottom: 16px; font-size: 16px; background: #fff; color: #222; }
+    .dark .profile-edit input { background: #23242b; color: #fff; border: 1px solid #333; }
     .btn-primary { background: #4318FF; color: #fff; border: none; border-radius: 8px; padding: 12px 0; font-size: 16px; cursor: pointer; width: 100%; }
     .cart-list { display: flex; flex-direction: column; gap: 16px; }
     .cart-card { background: #F4F7FE; border-radius: 12px; padding: 16px 20px; box-shadow: 0 2px 8px rgba(67,24,255,0.04); position: relative; }
+    .dark .cart-card { background: #23242b; color: #fff; }
     .cart-card strong { font-size: 16px; }
     .cart-card span { color: #555; font-size: 15px; display: block; margin-top: 2px; }
+    .dark .cart-card span, .dark .cart-card strong { color: #fff; }
     .cart-card .remove-btn { position: absolute; top: 16px; right: 16px; background: #ff4d4f; color: #fff; border: none; border-radius: 6px; padding: 6px 16px; cursor: pointer; }
     .payment-info { background: #F4F7FE; border-radius: 12px; padding: 24px 28px; box-shadow: 0 2px 8px rgba(67,24,255,0.04); }
+    .dark .payment-info { background: #23242b; color: #fff; }
+    .settings-section { background: #F4F7FE; border-radius: 12px; padding: 24px 28px; box-shadow: 0 2px 8px rgba(67,24,255,0.04); }
+    .dark .settings-section { background: #23242b; color: #fff; }
+    .switch { position: relative; display: inline-block; width: 48px; height: 28px; vertical-align: middle; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 28px; }
+    .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: #4318FF; }
+    input:checked + .slider:before { transform: translateX(20px); }
     .toast { position: fixed; top: -80px; left: 50%; transform: translateX(-50%); background: #4318FF; color: #fff; padding: 18px 36px; border-radius: 12px; font-size: 17px; font-weight: 500; box-shadow: 0 4px 24px rgba(67,24,255,0.12); z-index: 9999; opacity: 0; transition: top 0.5s, opacity 0.5s; }
     .toast.show { top: 32px; opacity: 1; }
   </style>
@@ -42,6 +61,7 @@
         <button class="nav-btn active" id="tab-profile">Profilim</button>
         <button class="nav-btn" id="tab-cart">Araç Sepetim</button>
         <button class="nav-btn" id="tab-payment">Ödeme Bilgileri</button>
+        <button class="nav-btn" id="tab-settings">Ayarlar</button>
       </div>
       <div class="logout">
         <button class="logout-btn" id="logout-btn">Çıkış Yap</button>
@@ -69,6 +89,18 @@
         <div class="payment-info">
           <p>Henüz ödeme bilgisi eklenmedi.</p>
           <p>Bu alanı dilediğin gibi özelleştirebiliriz.</p>
+        </div>
+      </section>
+      <section class="panel-section" id="section-settings">
+        <h2>Ayarlar</h2>
+        <div class="settings-section">
+          <label style="font-size:16px;display:flex;align-items:center;gap:16px;">
+            <span>Koyu Tema</span>
+            <label class="switch">
+              <input type="checkbox" id="theme-toggle">
+              <span class="slider"></span>
+            </label>
+          </label>
         </div>
       </section>
     </main>
@@ -100,15 +132,34 @@
     const tabProfile = document.getElementById('tab-profile');
     const tabCart = document.getElementById('tab-cart');
     const tabPayment = document.getElementById('tab-payment');
+    const tabSettings = document.getElementById('tab-settings');
     const sectionProfile = document.getElementById('section-profile');
     const sectionCart = document.getElementById('section-cart');
     const sectionPayment = document.getElementById('section-payment');
+    const sectionSettings = document.getElementById('section-settings');
     // Toast
     const toast = document.getElementById('toast');
     function showToast(msg) {
       toast.textContent = msg;
       toast.classList.add('show');
       setTimeout(() => { toast.classList.remove('show'); }, 2200);
+    }
+    // Koyu tema
+    const themeToggle = document.getElementById('theme-toggle');
+    function setTheme(dark) {
+      if (dark) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      }
+    }
+    themeToggle.onchange = () => setTheme(themeToggle.checked);
+    // Tema ilk yükleme
+    if (localStorage.getItem('theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+      themeToggle.checked = true;
     }
     // Auth
     auth.onAuthStateChanged(user => {
@@ -122,31 +173,18 @@
       }
     });
     // Sekme geçişleri
-    tabProfile.onclick = () => {
-      tabProfile.classList.add('active');
-      tabCart.classList.remove('active');
-      tabPayment.classList.remove('active');
-      sectionProfile.classList.add('active');
-      sectionCart.classList.remove('active');
-      sectionPayment.classList.remove('active');
-    };
-    tabCart.onclick = () => {
-      tabProfile.classList.remove('active');
-      tabCart.classList.add('active');
-      tabPayment.classList.remove('active');
-      sectionProfile.classList.remove('active');
-      sectionCart.classList.add('active');
-      sectionPayment.classList.remove('active');
-      renderCart();
-    };
-    tabPayment.onclick = () => {
-      tabProfile.classList.remove('active');
-      tabCart.classList.remove('active');
-      tabPayment.classList.add('active');
-      sectionProfile.classList.remove('active');
-      sectionCart.classList.remove('active');
-      sectionPayment.classList.add('active');
-    };
+    function setTab(tab) {
+      [tabProfile, tabCart, tabPayment, tabSettings].forEach(btn => btn.classList.remove('active'));
+      [sectionProfile, sectionCart, sectionPayment, sectionSettings].forEach(sec => sec.classList.remove('active'));
+      if (tab === 'profile') { tabProfile.classList.add('active'); sectionProfile.classList.add('active'); }
+      if (tab === 'cart') { tabCart.classList.add('active'); sectionCart.classList.add('active'); renderCart(); }
+      if (tab === 'payment') { tabPayment.classList.add('active'); sectionPayment.classList.add('active'); }
+      if (tab === 'settings') { tabSettings.classList.add('active'); sectionSettings.classList.add('active'); }
+    }
+    tabProfile.onclick = () => setTab('profile');
+    tabCart.onclick = () => setTab('cart');
+    tabPayment.onclick = () => setTab('payment');
+    tabSettings.onclick = () => setTab('settings');
     // Profil düzenleme
     editForm.onsubmit = async (e) => {
       e.preventDefault();
@@ -197,7 +235,7 @@
       showToast('Araç sepetten kaldırıldı!');
     }
     // İlk yüklemede profil sekmesi aktif olsun
-    renderCart();
+    setTab('profile');
   </script>
 </body>
 </html> 
