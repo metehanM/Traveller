@@ -78,28 +78,43 @@
           let roleLabel = ROLE_LABELS[role] || (email === 'mthnrsy@gmail.com' ? 'Owner' : 'Kullanıcı');
           let adminBadge = role ? `<b style='color:#05CD99'>(${roleLabel})</b>` : '';
           let buttons = '';
-          // Owner her role atayabilir
-          if (myRole === 'owner' && email !== user.email) {
-            buttons = ROLES.map(r => r !== role ? `<button onclick=\"setRole('${uid}','${r}')\" style=\"background:#05CD99;color:#fff;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;margin-left:4px;\">${ROLE_LABELS[r]}</button>` : '').join('');
+          // Ban durumu
+          const banned = userRoles[uid] && userRoles[uid + '_banned'];
+          // Hiyerarşiye göre atanabilir roller
+          let assignableRoles = [];
+          if (myRole === 'owner' && email !== user.email) assignableRoles = ROLES.filter(r => r !== role);
+          else if (myRole === 'admin-orta' && email !== user.email && role !== 'owner') assignableRoles = ['admin-alt','bayi'].filter(r => r !== role);
+          else if (myRole === 'admin-alt' && email !== user.email && role !== 'owner' && role !== 'admin-orta') assignableRoles = ['bayi'].filter(r => r !== role);
+          // Rol seçme menüsü
+          let roleSelect = '';
+          if (assignableRoles.length && !banned) {
+            roleSelect = `<select id='role-select-${uid}' style='margin-right:6px;'>` + assignableRoles.map(r => `<option value='${r}'>${ROLE_LABELS[r]}</option>`).join('') + `</select>`;
+            buttons += `<button onclick="setRoleFromSelect('${uid}')" style="background:#05CD99;color:#fff;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;margin-right:8px;">Rolü Ata</button>`;
           }
-          // Orta düzey sadece admin-alt ve bayi atayabilir
-          else if (myRole === 'admin-orta' && email !== user.email && role !== 'owner') {
-            if (role !== 'admin-alt') {
-              buttons += `<button onclick=\"setRole('${uid}','admin-alt')\" style=\"background:#05CD99;color:#fff;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;\">Alt Düzey Yap</button>`;
-            }
-            if (role !== 'bayi') {
-              buttons += `<button onclick=\"setRole('${uid}','bayi')\" style=\"background:#05CD99;color:#fff;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;margin-left:4px;\">Bayi Yap</button>`;
-            }
+          // Ban butonu
+          if (!banned && myRole !== 'bayi' && email !== user.email) {
+            buttons += `<button onclick="banUser('${uid}')" style="background:#ff4d4f;color:#fff;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;">Banla</button>`;
           }
-          // Alt düzey ve bayi sadece liste görebilir
+          let banBadge = banned ? `<span style='color:#ff4d4f;font-weight:600;margin-left:8px;'>Banlı</span>` : '';
           return `<div style=\"display:flex;align-items:center;justify-content:space-between;margin:8px 0;padding:8px 0;border-bottom:1px solid #333;\">
-            <span>${email} ${adminBadge}</span>
-            <span>${buttons}</span>
+            <span>${email} ${adminBadge} ${banBadge}</span>
+            <span>${roleSelect}${buttons}</span>
           </div>`;
         }).join('');
     });
     window.setRole = async function(uid, role) {
       await db.collection('users').doc(uid).set({ role }, { merge: true });
+      location.reload();
+    };
+    window.setRoleFromSelect = async function(uid) {
+      const sel = document.getElementById('role-select-' + uid);
+      if (!sel) return;
+      const role = sel.value;
+      await db.collection('users').doc(uid).set({ role }, { merge: true });
+      location.reload();
+    };
+    window.banUser = async function(uid) {
+      await db.collection('users').doc(uid).set({ banned: true }, { merge: true });
       location.reload();
     };
     document.getElementById('logout-btn').onclick = function() {
