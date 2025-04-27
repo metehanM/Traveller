@@ -282,15 +282,12 @@
     <main class="panel-content">
       <section class="panel-section active" id="section-profile">
         <h2>Profilim</h2>
-        <form class="profile-edit" id="edit-form">
-          <label for="edit-email">E-posta</label>
-          <input type="email" id="edit-email" disabled>
-          <label for="edit-name">Ad Soyad</label>
-          <input type="text" id="edit-name">
-          <label for="edit-password">Yeni Şifre</label>
-          <input type="password" id="edit-password" placeholder="Şifreyi değiştirmek için doldurun">
-          <button class="btn-primary" type="submit">Kaydet</button>
-        </form>
+        <div class="profile-summary" id="profile-summary" style="background:#fff;border-radius:14px;box-shadow:0 2px 12px rgba(67,24,255,0.06);padding:28px 24px;margin-bottom:24px;max-width:420px;margin-left:auto;margin-right:auto;">
+          <div style="font-size:17px;font-weight:600;margin-bottom:8px;">Kullanıcı Adı: <span id="summary-name"></span></div>
+          <div style="font-size:15px;margin-bottom:8px;">E-posta: <span id="summary-email"></span></div>
+          <div style="font-size:15px;margin-bottom:8px;">Hesap Açılış Tarihi: <span id="summary-created"></span></div>
+          <div style="font-size:15px;">Rol: <span id="summary-role" style="font-weight:600;"></span></div>
+        </div>
       </section>
       <section class="panel-section" id="section-cart">
         <h2>Araç Sepetim</h2>
@@ -305,6 +302,15 @@
       </section>
       <section class="panel-section" id="section-settings">
         <h2>Ayarlar</h2>
+        <form class="profile-edit" id="edit-form" style="background:#fff;border-radius:14px;box-shadow:0 2px 12px rgba(67,24,255,0.06);padding:28px 24px;margin-bottom:24px;max-width:420px;margin-left:auto;margin-right:auto;">
+          <label for="edit-email">E-posta</label>
+          <input type="email" id="edit-email" disabled>
+          <label for="edit-name">Ad Soyad</label>
+          <input type="text" id="edit-name">
+          <label for="edit-password">Yeni Şifre</label>
+          <input type="password" id="edit-password" placeholder="Şifreyi değiştirmek için doldurun">
+          <button class="btn-primary" type="submit">Kaydet</button>
+        </form>
         <div class="settings-section">
           <label style="font-size:16px;display:flex;align-items:center;gap:16px;">
             <span>Koyu Tema</span>
@@ -445,22 +451,29 @@
       if (user) {
         nameEl.textContent = 'Merhaba ' + (user.displayName ? user.displayName : user.email.split('@')[0]);
         avatarEl.textContent = (user.displayName ? user.displayName[0] : 'U').toUpperCase();
-        editEmail.value = user.email;
-        editName.value = user.displayName || '';
-        // Rol badge'i
+        // Profil özetini doldur
+        const summaryName = document.getElementById('summary-name');
+        const summaryEmail = document.getElementById('summary-email');
+        const summaryCreated = document.getElementById('summary-created');
+        const summaryRole = document.getElementById('summary-role');
         db.collection('users').doc(user.uid).get().then(doc => {
           let role = (doc.exists && doc.data().role) ? doc.data().role : 'user';
           let label = '';
-          let color = '#bbb';
-          if (role === 'owner') { label = 'Owner'; color = '#05CD99'; }
-          else if (role === 'bayi') { label = 'Bayi'; color = '#4318FF'; }
-          else if (role === 'admin-orta') { label = 'Admin Orta'; color = '#FFB800'; }
-          else if (role === 'admin-alt') { label = 'Admin Alt'; color = '#FF4D4F'; }
-          else { label = 'Normal Kullanıcı'; color = '#bbb'; }
-          const roleDiv = document.getElementById('profile-role');
-          roleDiv.textContent = label;
-          roleDiv.style.color = color;
-          roleDiv.style.fontWeight = '400';
+          if (role === 'owner') label = 'Owner';
+          else if (role === 'bayi') label = 'Bayi';
+          else if (role === 'admin-orta') label = 'Admin Orta';
+          else if (role === 'admin-alt') label = 'Admin Alt';
+          else label = 'Normal Kullanıcı';
+          summaryRole.textContent = label;
+          summaryName.textContent = user.displayName || '-';
+          summaryEmail.textContent = user.email;
+          // Hesap açılış tarihi
+          if (user.metadata && user.metadata.creationTime) {
+            const tarih = new Date(user.metadata.creationTime);
+            summaryCreated.textContent = tarih.toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' });
+          } else {
+            summaryCreated.textContent = '-';
+          }
         });
         // Firestore'da rol kontrolü
         db.collection('users').doc(user.uid).get().then(doc => {
