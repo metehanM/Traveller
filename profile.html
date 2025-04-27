@@ -66,8 +66,12 @@
     .dark .no-cars { color: #bbb; }
     select, textarea { font-family: inherit; font-size: 16px; border-radius: 8px; border: 1px solid #E6E8F0; padding: 10px; margin-bottom: 12px; }
     .dark select, .dark textarea { background: #23242b; color: #fff; border: 1px solid #333; }
-    .form-row { display: flex; gap: 18px; margin-bottom: 14px; }
-    .form-row > div { flex: 1; }
+    .form-row { display: flex; flex-wrap: wrap; gap: 18px; margin-bottom: 14px; }
+    .form-row > div { flex: 1 1 180px; min-width: 160px; }
+    @media (max-width: 700px) {
+      .form-row { flex-direction: column; gap: 10px; }
+      .form-row > div { min-width: 0; }
+    }
     .modern-form { background: var(--card, #fff); border-radius: 16px; box-shadow: 0 2px 12px rgba(67,24,255,0.06); padding: 28px 24px; margin-bottom: 24px; }
     .dark .modern-form { background: var(--card-dark, #23242b); }
     .modern-car-list .car-card { background: var(--card, #fff); border-radius: 16px; box-shadow: 0 2px 12px rgba(67,24,255,0.10); padding: 18px 24px; margin-bottom: 18px; display: flex; align-items: center; gap: 20px; transition: box-shadow 0.2s, background 0.2s; }
@@ -136,7 +140,7 @@
         <h2>Aracını Kiraya Ver</h2>
         <form id="rentout-form" class="settings-section modern-form" enctype="multipart/form-data">
           <div class="form-row">
-            <div><label>Marka</label><input type="text" id="car-brand" required></div>
+            <div><label>Marka</label><select id="car-brand" required></select></div>
             <div><label>Model</label><input type="text" id="car-model" required></div>
           </div>
           <div class="form-row">
@@ -170,7 +174,7 @@
             <div><label for="findcar-district">İlçe</label><select id="findcar-district" required><option value="">İlçe seçin</option></select></div>
           </div>
           <div class="form-row">
-            <div><label for="findcar-brand">Marka</label><input type="text" id="findcar-brand" placeholder="Opsiyonel"></div>
+            <div><label for="findcar-brand">Marka</label><select id="findcar-brand"><option value="">Hepsi</option></select></div>
             <div><label for="findcar-model">Model</label><input type="text" id="findcar-model" placeholder="Opsiyonel"></div>
           </div>
           <div class="form-row">
@@ -381,10 +385,29 @@
       }
     };
     // Araç Bul sekmesi fonksiyonları
+    const MARKA_LIST = ["Renault", "Fiat", "Ford", "Volkswagen", "Toyota", "Hyundai", "Peugeot", "Opel", "Honda", "Citroen", "BMW", "Mercedes"];
+    function fillBrandSelect(selectId, withAllOpt) {
+      const sel = document.getElementById(selectId);
+      sel.innerHTML = '';
+      if (withAllOpt) {
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = 'Hepsi';
+        sel.appendChild(opt);
+      }
+      MARKA_LIST.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m;
+        opt.textContent = m;
+        sel.appendChild(opt);
+      });
+    }
+    fillBrandSelect('car-brand', false);
+    fillBrandSelect('findcar-brand', true);
     async function renderFindCars() {
       const city = document.getElementById('findcar-city').value;
       const district = document.getElementById('findcar-district').value;
-      const brand = document.getElementById('findcar-brand').value.trim().toLowerCase();
+      const brand = document.getElementById('findcar-brand').value;
       const model = document.getElementById('findcar-model').value.trim().toLowerCase();
       const year = document.getElementById('findcar-year').value.trim();
       const gear = document.getElementById('findcar-gear').value;
@@ -398,7 +421,7 @@
       const snapshot = await query.get();
       let cars = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       // Ek filtreler
-      if (brand) cars = cars.filter(car => (car.brand || '').toLowerCase().includes(brand));
+      if (brand) cars = cars.filter(car => (car.brand || '') === brand);
       if (model) cars = cars.filter(car => (car.model || '').toLowerCase().includes(model));
       if (year) cars = cars.filter(car => String(car.year) === year);
       if (gear) cars = cars.filter(car => car.gear === gear);
