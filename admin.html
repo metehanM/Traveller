@@ -133,8 +133,16 @@
             roleSelect = `<select id='role-select-${uid}'>` + assignableRoles.map(r => `<option value='${r}'>${ROLE_LABELS[r]}</option>`).join('') + `</select>`;
             buttons += `<button onclick=\"setRoleFromSelect('${uid}')\" style=\"margin-left:6px;\">Rolü Ata</button>`;
           }
-          if (!banned && myRole !== 'bayi' && email !== user.email) {
-            buttons += `<button class='ban' onclick=\"banUser('${uid}')\" style=\"margin-left:6px;\">Banla</button>`;
+          // Hiyerarşik ban yetkisi
+          const myIdx = ROLES.indexOf(myRole);
+          const userIdx = ROLES.indexOf(role);
+          // Sadece alt düzey kullanıcıyı banlayabilsin
+          if (myIdx < userIdx && email !== user.email) {
+            if (!banned) {
+              buttons += `<button class='ban' onclick=\"banUser('${uid}')\" style=\"margin-left:6px;\">Banla</button>`;
+            } else {
+              buttons += `<button class='ban' onclick=\"unbanUser('${uid}')\" style=\"margin-left:6px;background:#05CD99;\">Banı Kaldır</button>`;
+            }
           }
           let banBadge = banned ? `<span class='ban-badge'>Banlı</span>` : '';
           return `<div class='user-row'><span>${email} ${adminBadge} ${banBadge}</span><span>${roleSelect}${buttons}</span></div>`;
@@ -149,6 +157,10 @@
     };
     window.banUser = async function(uid) {
       await db.collection('users').doc(uid).set({ banned: true }, { merge: true });
+      location.reload();
+    };
+    window.unbanUser = async function(uid) {
+      await db.collection('users').doc(uid).update({ banned: firebase.firestore.FieldValue.delete() });
       location.reload();
     };
     // Modal oluştur
