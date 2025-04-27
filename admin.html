@@ -7,19 +7,53 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Poppins', sans-serif; background: #181A20; color: #fff; margin: 0; }
-    .admin-container { max-width: 500px; margin: 80px auto; background: #23242b; border-radius: 18px; box-shadow: 0 4px 24px rgba(67,24,255,0.10); padding: 40px 32px; text-align: center; }
-    h1 { color: #05CD99; margin-bottom: 18px; }
-    .logout-btn { background: #ff4d4f; color: #fff; border: none; border-radius: 8px; padding: 10px 24px; font-size: 16px; cursor: pointer; margin-top: 32px; }
+    .admin-root { display: flex; min-height: 100vh; }
+    .sidebar { width: 220px; background: #23242b; border-radius: 0 24px 24px 0; box-shadow: 2px 0 16px rgba(67,24,255,0.06); padding: 40px 0 0 0; display: flex; flex-direction: column; align-items: center; }
+    .sidebar .logo { font-size: 22px; font-weight: 700; color: #05CD99; margin-bottom: 32px; }
+    .sidebar .nav { width: 100%; display: flex; flex-direction: column; gap: 0; }
+    .sidebar .nav-btn { width: 100%; background: none; border: none; text-align: left; padding: 16px 32px; font-size: 16px; color: #fff; cursor: pointer; border-left: 4px solid transparent; transition: background 0.2s, border-color 0.2s, color 0.3s; }
+    .sidebar .nav-btn.active, .sidebar .nav-btn:hover { background: #181A20; border-left: 4px solid #05CD99; }
+    .sidebar .bottom { margin-top: auto; margin-bottom: 32px; }
+    .sidebar .logout-btn { background: #ff4d4f; color: #fff; border: none; border-radius: 8px; padding: 10px 24px; font-size: 16px; cursor: pointer; width: 80%; margin-left: 10%; }
+    .sidebar .profile-btn { background: #05CD99; color: #fff; border: none; border-radius: 8px; padding: 10px 24px; font-size: 16px; cursor: pointer; width: 80%; margin: 16px 10% 0 10%; }
+    .panel-content { flex: 1; padding: 48px 40px; transition: background 0.3s, color 0.3s; }
+    .panel-section { display: none; max-width: 800px; margin: 0 auto; }
+    .panel-section.active { display: block; }
+    .user-list { background: #23242b; border-radius: 16px; box-shadow: 0 2px 12px rgba(67,24,255,0.10); padding: 28px 24px; margin-bottom: 24px; }
+    .user-row { display: flex; align-items: center; justify-content: space-between; margin: 8px 0; padding: 8px 0; border-bottom: 1px solid #333; }
+    .user-row:last-child { border-bottom: none; }
+    .user-row span { font-size: 15px; }
+    .user-row .badge { color: #05CD99; font-weight: 600; margin-left: 8px; }
+    .user-row .ban-badge { color: #ff4d4f; font-weight: 600; margin-left: 8px; }
+    .user-row select, .user-row button { margin-left: 8px; }
+    .user-row button { background: #05CD99; color: #fff; border: none; border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+    .user-row button.ban { background: #ff4d4f; }
+    h2 { margin-top: 0; }
   </style>
 </head>
 <body>
-  <div class="admin-container" id="admin-content" style="display:none;">
-    <h1>Admin Paneli</h1>
-    <button class="logout-btn" id="back-profile-btn" style="background:#05CD99;margin-bottom:18px;">Profile'a Dön</button>
-    <p>Hoşgeldin <span id="admin-email"></span>!</p>
-    <p>Burada sadece adminlerin görebileceği özel içerikler yer alacak.</p>
-    <div id="user-list"></div>
-    <button class="logout-btn" id="logout-btn">Çıkış Yap</button>
+  <div class="admin-root">
+    <aside class="sidebar">
+      <div class="logo">Admin Paneli</div>
+      <div class="nav">
+        <button class="nav-btn active" id="tab-users">Kullanıcılar</button>
+        <button class="nav-btn" id="tab-settings">Ayarlar</button>
+      </div>
+      <div class="bottom">
+        <button class="profile-btn" id="profile-btn">Profile'a Dön</button>
+        <button class="logout-btn" id="logout-btn">Çıkış Yap</button>
+      </div>
+    </aside>
+    <main class="panel-content">
+      <section class="panel-section active" id="section-users">
+        <h2>Kullanıcılar</h2>
+        <div class="user-list" id="user-list"></div>
+      </section>
+      <section class="panel-section" id="section-settings">
+        <h2>Ayarlar</h2>
+        <div style="background:#23242b;border-radius:16px;padding:24px;">Buraya admin ayarları eklenebilir.</div>
+      </section>
+    </main>
   </div>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -37,20 +71,25 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-    // Rol hiyerarşisi
     const ROLES = ['owner', 'admin-orta', 'admin-alt', 'bayi'];
     const ROLE_LABELS = { 'owner': 'Owner', 'admin-orta': 'Orta Düzey', 'admin-alt': 'Alt Düzey', 'bayi': 'Bayi' };
-    // Sadece adminler erişebilsin
+    // Sekme geçişleri
+    const tabUsers = document.getElementById('tab-users');
+    const tabSettings = document.getElementById('tab-settings');
+    const sectionUsers = document.getElementById('section-users');
+    const sectionSettings = document.getElementById('section-settings');
+    tabUsers.onclick = () => { tabUsers.classList.add('active'); tabSettings.classList.remove('active'); sectionUsers.classList.add('active'); sectionSettings.classList.remove('active'); };
+    tabSettings.onclick = () => { tabSettings.classList.add('active'); tabUsers.classList.remove('active'); sectionSettings.classList.add('active'); sectionUsers.classList.remove('active'); };
+    document.getElementById('profile-btn').onclick = () => window.location.href = 'profile.html';
+    document.getElementById('logout-btn').onclick = function() { auth.signOut().then(() => window.location.href = 'login.html'); };
+    // Admin kontrolü ve kullanıcıları listele
     auth.onAuthStateChanged(async user => {
       if (!user) return window.location.href = 'login.html';
-      // Kullanıcı Firestore'da admin mi kontrol et
       const userDoc = await db.collection('users').doc(user.uid).get();
       let myRole = 'admin-alt';
       if (user.email === 'mthnrsy@gmail.com') myRole = 'owner';
       else if (userDoc.exists && userDoc.data().role) myRole = userDoc.data().role;
       if (!ROLES.includes(myRole)) return window.location.href = 'login.html';
-      document.getElementById('admin-content').style.display = 'block';
-      document.getElementById('admin-email').textContent = user.email + ' (' + ROLE_LABELS[myRole] + ')';
       // Firestore'daki kullanıcıları çek ve listele
       const usersSnap = await db.collection('users').get();
       const users = usersSnap.docs.map(doc => ({
@@ -59,44 +98,32 @@
         role: doc.data().role,
         banned: doc.data().banned
       }));
-      // Listele
       const userListDiv = document.getElementById('user-list');
-      userListDiv.innerHTML = '<h3>Kullanıcılar</h3>' +
+      userListDiv.innerHTML = users.length === 0 ? '<em>Kullanıcı yok.</em>' :
         users.map(u => {
           const uid = u.uid;
           const email = u.email;
           let role = u.role || '';
           let roleLabel = ROLE_LABELS[role] || (email === 'mthnrsy@gmail.com' ? 'Owner' : 'Kullanıcı');
-          let adminBadge = role ? `<b style='color:#05CD99'>(${roleLabel})</b>` : '';
+          let adminBadge = role ? `<span class='badge'>${roleLabel}</span>` : '';
           let buttons = '';
-          // Ban durumu
           const banned = u.banned;
-          // Hiyerarşiye göre atanabilir roller
           let assignableRoles = [];
           if (myRole === 'owner' && email !== user.email) assignableRoles = ROLES.filter(r => r !== role);
           else if (myRole === 'admin-orta' && email !== user.email && role !== 'owner') assignableRoles = ['admin-alt','bayi'].filter(r => r !== role);
           else if (myRole === 'admin-alt' && email !== user.email && role !== 'owner' && role !== 'admin-orta') assignableRoles = ['bayi'].filter(r => r !== role);
-          // Rol seçme menüsü
           let roleSelect = '';
           if (assignableRoles.length && !banned) {
-            roleSelect = `<select id='role-select-${uid}' style='margin-right:6px;'>` + assignableRoles.map(r => `<option value='${r}'>${ROLE_LABELS[r]}</option>`).join('') + `</select>`;
-            buttons += `<button onclick=\"setRoleFromSelect('${uid}')\" style=\"background:#05CD99;color:#fff;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;margin-right:8px;\">Rolü Ata</button>`;
+            roleSelect = `<select id='role-select-${uid}'>` + assignableRoles.map(r => `<option value='${r}'>${ROLE_LABELS[r]}</option>`).join('') + `</select>`;
+            buttons += `<button onclick=\"setRoleFromSelect('${uid}')\" style=\"margin-left:6px;\">Rolü Ata</button>`;
           }
-          // Ban butonu
           if (!banned && myRole !== 'bayi' && email !== user.email) {
-            buttons += `<button onclick=\"banUser('${uid}')\" style=\"background:#ff4d4f;color:#fff;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;\">Banla</button>`;
+            buttons += `<button class='ban' onclick=\"banUser('${uid}')\" style=\"margin-left:6px;\">Banla</button>`;
           }
-          let banBadge = banned ? `<span style='color:#ff4d4f;font-weight:600;margin-left:8px;'>Banlı</span>` : '';
-          return `<div style=\"display:flex;align-items:center;justify-content:space-between;margin:8px 0;padding:8px 0;border-bottom:1px solid #333;\">
-            <span>${email} ${adminBadge} ${banBadge}</span>
-            <span>${roleSelect}${buttons}</span>
-          </div>`;
+          let banBadge = banned ? `<span class='ban-badge'>Banlı</span>` : '';
+          return `<div class='user-row'><span>${email} ${adminBadge} ${banBadge}</span><span>${roleSelect}${buttons}</span></div>`;
         }).join('');
     });
-    window.setRole = async function(uid, role) {
-      await db.collection('users').doc(uid).set({ role }, { merge: true });
-      location.reload();
-    };
     window.setRoleFromSelect = async function(uid) {
       const sel = document.getElementById('role-select-' + uid);
       if (!sel) return;
@@ -107,12 +134,6 @@
     window.banUser = async function(uid) {
       await db.collection('users').doc(uid).set({ banned: true }, { merge: true });
       location.reload();
-    };
-    document.getElementById('logout-btn').onclick = function() {
-      auth.signOut().then(() => window.location.href = 'login.html');
-    };
-    document.getElementById('back-profile-btn').onclick = function() {
-      window.location.href = 'profile.html';
     };
   </script>
 </body>
