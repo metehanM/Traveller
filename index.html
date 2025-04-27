@@ -18,7 +18,7 @@
       margin-left: 8px;
       font-weight: 600;
       box-shadow: 0 2px 8px rgba(67,24,255,0.06);
-      transition: background 0.2s, color 0.2s;
+      transition: background 0.2s, color 0.2s, border 0.2s;
     }
     .btn-primary.btn-auth {
       background: var(--primary, #4318FF);
@@ -36,6 +36,39 @@
     .btn-secondary.btn-auth:hover {
       background: var(--primary, #4318FF);
       color: #fff;
+    }
+    /* Koyu modda header ve butonlar */
+    .dark .header {
+      background: rgba(35,36,43,0.95) !important;
+      box-shadow: 0 4px 24px rgba(67,24,255,0.10);
+      backdrop-filter: blur(6px);
+    }
+    .dark .auth-buttons .btn-primary.btn-auth {
+      background: #fff;
+      color: #4318FF;
+      border: 2px solid #fff;
+    }
+    .dark .auth-buttons .btn-primary.btn-auth:hover {
+      background: #4318FF;
+      color: #fff;
+      border: 2px solid #4318FF;
+    }
+    .dark .auth-buttons .btn-secondary.btn-auth {
+      background: transparent;
+      color: #fff;
+      border: 2px solid #fff;
+    }
+    .dark .auth-buttons .btn-secondary.btn-auth:hover {
+      background: #fff;
+      color: #4318FF;
+    }
+    .dark .nav-links a {
+      color: #fff;
+      font-weight: 600;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+    .dark .nav-links a:hover, .dark .nav-links a.active {
+      color: #05CD99;
     }
     @media (max-width: 600px) {
       .auth-buttons { flex-direction: column; gap: 8px; }
