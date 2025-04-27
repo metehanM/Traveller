@@ -3,114 +3,187 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Araç Kirala | Traveller</title>
+  <title>Araçlar | Traveller</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <style>
-    body { background: #F4F7FE; }
-    .booking-container { max-width: 600px; margin: 48px auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(67,24,255,0.08); padding: 40px 32px; }
-    .booking-title { text-align: center; margin-bottom: 24px; }
-    .booking-form { display: flex; flex-direction: column; gap: 16px; margin-bottom: 32px; }
-    .booking-form label { font-weight: 500; margin-bottom: 4px; }
-    .booking-form input, .booking-form select { padding: 12px; border-radius: 8px; border: 1px solid #E6E8F0; font-size: 16px; }
-    .car-list { display: flex; flex-direction: column; gap: 20px; }
-    .car-card { display: flex; align-items: center; gap: 20px; background: #F4F7FE; border-radius: 12px; padding: 16px; }
-    .car-card img { width: 100px; border-radius: 8px; object-fit: cover; }
-    .car-info { flex: 1; }
-    .car-info h3 { margin: 0 0 8px 0; }
-    .car-info span { color: #888; font-size: 15px; }
-    .btn-rent { background: #4318FF; color: #fff; border: none; border-radius: 8px; padding: 10px 24px; font-size: 16px; cursor: pointer; }
-    .go-profile { display: block; text-align: center; margin: 32px 0 0 0; color: #4318FF; text-decoration: none; font-weight: 500; }
-    .no-cars { text-align: center; color: #888; margin-top: 32px; font-size: 18px; }
+    body { font-family: 'Poppins', sans-serif; background: #F4F7FE; color: #222; margin: 0; }
+    .dark body { background: #181A20; color: #fff; }
+    .main-container { max-width: 1100px; margin: 0 auto; padding: 36px 16px; }
+    .header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+    .header-row h1 { font-size: 2rem; margin: 0; color: #4318FF; }
+    .dark .header-row h1 { color: #05CD99; }
+    .btn-primary { background: #4318FF; color: #fff; border: none; border-radius: 8px; padding: 12px 28px; font-size: 17px; cursor: pointer; font-weight: 500; }
+    .btn-primary:hover { background: #2d0fb2; }
+    .dark .btn-primary { background: #05CD99; color: #181A20; }
+    .cars-catalog { display: flex; flex-wrap: wrap; gap: 24px; }
+    .car-card { background: #fff; border-radius: 14px; box-shadow: 0 2px 12px rgba(67,24,255,0.06); padding: 18px 20px; width: 320px; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; position: relative; transition: box-shadow 0.2s, background 0.2s; }
+    .car-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 10px; background: #f4f4f4; }
+    .car-card .car-title { font-size: 18px; font-weight: 600; margin-bottom: 2px; color: #4318FF; }
+    .car-card .car-info { font-size: 15px; color: #444; margin-bottom: 2px; }
+    .car-card .car-desc { font-size: 14px; color: #666; margin-bottom: 4px; }
+    .car-card .car-actions { display: flex; gap: 10px; margin-top: 8px; }
+    .car-card .car-actions button { background: #4318FF; color: #fff; border: none; border-radius: 6px; padding: 6px 14px; cursor: pointer; font-size: 15px; }
+    .car-card .car-actions .delete-btn { background: #ff4d4f; }
+    @media (max-width: 900px) { .cars-catalog { flex-direction: column; gap: 14px; } .car-card { width: 100%; } }
+    .dark .car-card { background: #23242b; color: #fff; box-shadow: 0 2px 12px rgba(67,24,255,0.10); }
+    .dark .car-card .car-title { color: #05CD99; }
+    .dark .car-card .car-info { color: #bbb; }
+    .dark .car-card .car-desc { color: #aaa; }
+    .dark .car-card .car-actions button { background: #4318FF; color: #fff; }
+    .dark .car-card .car-actions .delete-btn { background: #ff4d4f; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; }
+    .modal-content { background: #fff; padding: 36px 32px; border-radius: 16px; max-width: 480px; width: 95vw; text-align: left; box-shadow: 0 4px 24px #0003; position: relative; }
+    .dark .modal-content { background: #23242b; color: #fff; }
+    .modal-content label { font-size: 15px; font-weight: 500; margin-bottom: 2px; display: block; }
+    .modal-content input, .modal-content select, .modal-content textarea { width: 100%; font-size: 15px; padding: 7px 8px; border-radius: 8px; border: 1px solid #E6E8F0; background: #f9f9fb; margin-bottom: 12px; }
+    .dark .modal-content input, .dark .modal-content select, .dark .modal-content textarea { background: #23242b; color: #fff; border: 1px solid #444; }
+    .modal-content button { width: 100%; margin-top: 8px; background: #4318FF; color: #fff; border: none; border-radius: 8px; padding: 10px 0; font-size: 16px; cursor: pointer; }
+    .modal-content .close-btn { background: #ff4d4f; color: #fff; }
+    .toast { position: fixed; top: -80px; left: 50%; transform: translateX(-50%); background: #4318FF; color: #fff; padding: 18px 36px; border-radius: 12px; font-size: 17px; font-weight: 500; box-shadow: 0 4px 24px rgba(67,24,255,0.12); z-index: 9999; opacity: 0; transition: top 0.5s, opacity 0.5s; }
+    .toast.show { top: 32px; opacity: 1; }
   </style>
 </head>
 <body>
-  <div class="booking-container">
-    <h2 class="booking-title">Araç Kirala</h2>
-    <form class="booking-form" id="booking-form">
-      <div>
-        <label for="city">Şehir</label>
-        <input type="text" id="city" placeholder="Şehir seçin" required>
+  <div class="main-container">
+    <div class="header-row">
+      <h1>Araçlar</h1>
+      <button id="add-car-btn" class="btn-primary" style="display:none;">Araç Ekle</button>
+    </div>
+    <div id="cars-list" class="cars-catalog"></div>
+    <div id="add-car-modal" class="modal">
+      <div class="modal-content">
+        <h3 style="color:#4318FF;margin-bottom:18px;">Yeni Araç Ekle</h3>
+        <form id="add-car-form">
+          <label>Marka</label><input type="text" id="modal-car-brand" required>
+          <label>Model</label><input type="text" id="modal-car-model" required>
+          <label>Yıl</label><input type="number" id="modal-car-year" min="1980" max="2024" required>
+          <label>Vites Tipi</label><select id="modal-car-gear" required><option value="">Seçiniz</option><option value="Otomatik">Otomatik</option><option value="Manuel">Manuel</option></select>
+          <label>Şehir</label><input type="text" id="modal-car-city" required>
+          <label>İlçe</label><input type="text" id="modal-car-district" required>
+          <label>Fiyat (₺/gün)</label><input type="number" id="modal-car-price" min="1" required>
+          <label>Fotoğraf</label><input type="file" id="modal-car-img" accept="image/*">
+          <label>Açıklama</label><textarea id="modal-car-desc" rows="2"></textarea>
+          <button class="btn-primary" type="submit">Kaydet</button>
+          <button type="button" id="close-add-car-modal" class="close-btn">Vazgeç</button>
+        </form>
       </div>
-      <div>
-        <label for="district">İlçe</label>
-        <input type="text" id="district" placeholder="İlçe seçin" required>
-      </div>
-      <div>
-        <label for="pickup">Alış Tarihi</label>
-        <input type="date" id="pickup" required>
-      </div>
-      <div>
-        <label for="dropoff">İade Tarihi</label>
-        <input type="date" id="dropoff" required>
-      </div>
-    </form>
-    <div class="car-list" id="car-list"></div>
-    <div class="no-cars" id="no-cars" style="display:none;">Bölgenizde uygun araç bulunamadı.</div>
-    <a href="profile.html" class="go-profile">Profil Paneli</a>
+    </div>
+    <div class="toast" id="toast"></div>
   </div>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script>
-    // Araçları filtrele ve listele
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRArf2VPbZuvLueY2qm2Lz9GhQXLvhzxY",
+      authDomain: "rentcars-1077b.firebaseapp.com",
+      projectId: "rentcars-1077b",
+      storageBucket: "rentcars-1077b.appspot.com",
+      messagingSenderId: "564934399024",
+      appId: "1:564934399024:web:11dcb72be4d44e2a1709f5",
+      measurementId: "G-DMX2083TNQ"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const carsListDiv = document.getElementById('cars-list');
+    const addCarBtn = document.getElementById('add-car-btn');
+    const addCarModal = document.getElementById('add-car-modal');
+    const closeAddCarModal = document.getElementById('close-add-car-modal');
+    const addCarForm = document.getElementById('add-car-form');
+    const toast = document.getElementById('toast');
+    let allCars = [];
+    let myRole = 'user';
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => { toast.classList.remove('show'); }, 2200);
+    }
     function renderCars() {
-      const city = document.getElementById('city').value.trim().toLowerCase();
-      const district = document.getElementById('district').value.trim().toLowerCase();
-      const carList = document.getElementById('car-list');
-      const noCars = document.getElementById('no-cars');
-      const cars = JSON.parse(localStorage.getItem('cars') || '[]');
-      let filtered = cars.filter(car =>
-        (car.city && car.city.toLowerCase() === city && car.district && car.district.toLowerCase() === district)
-      );
-      // Eğer ilçe yoksa şehirdeki araçları göster
-      if (filtered.length === 0 && city) {
-        filtered = cars.filter(car => car.city && car.city.toLowerCase() === city);
-      }
-      if (!city) filtered = [];
-      if (filtered.length === 0) {
-        carList.innerHTML = '';
-        noCars.style.display = 'block';
+      if (!allCars.length) {
+        carsListDiv.innerHTML = '<em>Henüz eklenmiş araç yok.</em>';
         return;
       }
-      noCars.style.display = 'none';
-      carList.innerHTML = filtered.map((car, i) => `
+      carsListDiv.innerHTML = allCars.map(car => `
         <div class="car-card">
-          ${car.img ? `<img src="${car.img}" alt="${car.brand} ${car.model}">` : ''}
-          <div class="car-info">
-            <h3>${car.brand} ${car.model} (${car.year})</h3>
-            <span>${car.gear} | ${car.city}, ${car.district}</span><br>
-            <span>Fiyat: ${car.price} ₺/gün</span><br>
-            <span>${car.desc || ''}</span>
+          ${car.img ? `<img src="${car.img}" alt="${car.brand} ${car.model}">` : '<img src="assets/car1.jpg" alt="Araç">'}
+          <div class="car-title">${car.brand} ${car.model} (${car.year})</div>
+          <div class="car-info">${car.gear} | ${car.city}, ${car.district}</div>
+          <div class="car-info">Fiyat: ${car.price} ₺/gün</div>
+          <div class="car-desc">${car.desc || ''}</div>
+          <div class="car-actions">
+            <button onclick="addToCartFromBooking('${car.id}')">Sepete Ekle</button>
           </div>
-          <button class="btn-rent" onclick="addToCart(${i})">Sepete Ekle</button>
         </div>
       `).join('');
     }
-    // Sepete ekle fonksiyonu
-    function addToCart(carIdx) {
-      const city = document.getElementById('city').value.trim();
-      const district = document.getElementById('district').value.trim();
-      const pickup = document.getElementById('pickup').value;
-      const dropoff = document.getElementById('dropoff').value;
-      if (!city || !district || !pickup || !dropoff) {
-        alert('Lütfen şehir, ilçe ve tarihleri doldurun!');
-        return;
-      }
-      const cars = JSON.parse(localStorage.getItem('cars') || '[]');
-      const car = cars[carIdx];
-      if (!car) return;
-      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-      if (cart.some(item => item.car.brand === car.brand && item.car.model === car.model && item.car.city === car.city && item.car.district === car.district)) {
-        alert('Bu araç zaten sepette!');
-        return;
-      }
-      cart.push({car, city, district, pickup, dropoff});
-      localStorage.setItem('cart', JSON.stringify(cart));
-      alert('Araç sepete eklendi!');
+    async function fetchAllCars() {
+      const snap = await db.collection('cars').orderBy('createdAt', 'desc').get();
+      allCars = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      renderCars();
     }
-    // Form değişince araçları filtrele
-    document.getElementById('city').oninput = renderCars;
-    document.getElementById('district').oninput = renderCars;
-    // İlk yüklemede boş liste
-    renderCars();
+    window.addToCartFromBooking = async function(carId) {
+      const doc = await db.collection('cars').doc(carId).get();
+      const car = doc.data();
+      if (!car) return;
+      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      if (cart.some(item => item.carId === carId)) {
+        showToast('Bu araç zaten sepette!');
+        return;
+      }
+      cart.push({carId, car});
+      localStorage.setItem('cart', JSON.stringify(cart));
+      showToast('Araç sepete eklendi!');
+    };
+    // Yetki kontrolü ve araç ekleme butonu
+    auth.onAuthStateChanged(async user => {
+      if (!user) return;
+      const userDoc = await db.collection('users').doc(user.uid).get();
+      myRole = (userDoc.exists && userDoc.data().role) ? userDoc.data().role : 'user';
+      if (myRole === 'owner' || myRole === 'bayi') {
+        addCarBtn.style.display = 'inline-block';
+      }
+      fetchAllCars();
+    });
+    addCarBtn.onclick = () => { addCarModal.style.display = 'flex'; };
+    closeAddCarModal.onclick = () => { addCarModal.style.display = 'none'; };
+    addCarForm.onsubmit = async function(e) {
+      e.preventDefault();
+      const user = auth.currentUser;
+      if (!user) return;
+      const brand = document.getElementById('modal-car-brand').value.trim();
+      const model = document.getElementById('modal-car-model').value.trim();
+      const year = document.getElementById('modal-car-year').value.trim();
+      const city = document.getElementById('modal-car-city').value.trim();
+      const district = document.getElementById('modal-car-district').value.trim();
+      const price = document.getElementById('modal-car-price').value.trim();
+      const desc = document.getElementById('modal-car-desc').value.trim();
+      const gear = document.getElementById('modal-car-gear').value;
+      const imgInput = document.getElementById('modal-car-img');
+      let imgData = '';
+      if (imgInput.files && imgInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = async function(evt) {
+          imgData = evt.target.result;
+          await saveCar(imgData);
+        };
+        reader.readAsDataURL(imgInput.files[0]);
+      } else {
+        await saveCar(imgData);
+      }
+      async function saveCar(img) {
+        await db.collection('cars').add({
+          owner: user.uid,
+          brand, model, year, city, district, price, desc, gear, img,
+          createdAt: new Date()
+        });
+        addCarModal.style.display = 'none';
+        addCarForm.reset();
+        fetchAllCars();
+        showToast('Araç başarıyla eklendi!');
+      }
+    };
   </script>
 </body>
 </html> 
