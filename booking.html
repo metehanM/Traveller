@@ -92,8 +92,20 @@
           <option value="Manuel">Manuel</option>
         </select>
       </label>
-      <label>Marka/Model
-        <input type="text" id="filter-brandmodel" placeholder="Marka veya model">
+      <label>Marka
+        <select id="filter-brand">
+          <option value="">Tümü</option>
+        </select>
+      </label>
+      <label>Model
+        <select id="filter-model" disabled>
+          <option value="">Tümü</option>
+        </select>
+      </label>
+      <label>Alt Model
+        <select id="filter-submodel" disabled>
+          <option value="">Tümü</option>
+        </select>
       </label>
       <label>Fiyat
         <input type="number" id="filter-minprice" placeholder="Min" min="0"> -
@@ -105,8 +117,18 @@
       <div class="modal-content">
         <h3 style="color:#4318FF;margin-bottom:18px;">Yeni Araç Ekle</h3>
         <form id="add-car-form">
-          <label>Marka</label><input type="text" id="modal-car-brand" required>
-          <label>Model</label><input type="text" id="modal-car-model" required>
+          <label>Marka</label>
+          <select id="modal-car-brand" required>
+            <option value="">Seçiniz</option>
+          </select>
+          <label>Model</label>
+          <select id="modal-car-model" required disabled>
+            <option value="">Seçiniz</option>
+          </select>
+          <label>Alt Model</label>
+          <select id="modal-car-submodel" required disabled>
+            <option value="">Seçiniz</option>
+          </select>
           <label>Yıl</label><input type="number" id="modal-car-year" min="1980" max="2024" required>
           <label>Vites Tipi</label><select id="modal-car-gear" required><option value="">Seçiniz</option><option value="Otomatik">Otomatik</option><option value="Manuel">Manuel</option></select>
           <label>Şehir</label><input type="text" id="modal-car-city" required>
@@ -146,11 +168,354 @@
     // Filtreler
     const filterCity = document.getElementById('filter-city');
     const filterGear = document.getElementById('filter-gear');
-    const filterBrandModel = document.getElementById('filter-brandmodel');
+    const filterBrandEl = document.getElementById('filter-brand');
+    const filterModelEl = document.getElementById('filter-model');
+    const filterSubmodelEl = document.getElementById('filter-submodel');
     const filterMinPrice = document.getElementById('filter-minprice');
     const filterMaxPrice = document.getElementById('filter-maxprice');
     let allCars = [];
     let myRole = 'user';
+    // Gelişmiş marka/model/alt model verisi
+    const CAR_BRANDS = [
+      {
+        brand: "BMW",
+        models: [
+          { name: "1 Serisi", submodels: ["116i", "118i", "120d"] },
+          { name: "3 Serisi", submodels: ["316i", "318i", "320i", "320d", "330i", "330d"] },
+          { name: "5 Serisi", submodels: ["520i", "520d", "530i", "530d"] },
+          { name: "X1", submodels: ["sDrive18i", "xDrive20d"] },
+          { name: "X3", submodels: ["xDrive20i", "xDrive30d"] }
+        ]
+      },
+      {
+        brand: "Mercedes-Benz",
+        models: [
+          { name: "A Serisi", submodels: ["A180", "A200", "A250"] },
+          { name: "C Serisi", submodels: ["C180", "C200", "C220d"] },
+          { name: "E Serisi", submodels: ["E200", "E220d", "E300"] },
+          { name: "GLA", submodels: ["GLA180", "GLA200"] }
+        ]
+      },
+      {
+        brand: "Audi",
+        models: [
+          { name: "A3", submodels: ["1.6 TDI", "1.4 TFSI", "1.5 TFSI"] },
+          { name: "A4", submodels: ["2.0 TDI", "1.4 TFSI", "2.0 TFSI"] },
+          { name: "Q3", submodels: ["35 TFSI", "40 TFSI"] }
+        ]
+      },
+      {
+        brand: "Volkswagen",
+        models: [
+          { name: "Golf", submodels: ["1.0 TSI", "1.4 TSI", "1.6 TDI"] },
+          { name: "Passat", submodels: ["1.5 TSI", "2.0 TDI"] },
+          { name: "Polo", submodels: ["1.0 TSI", "1.4 TDI"] }
+        ]
+      },
+      {
+        brand: "Renault",
+        models: [
+          { name: "Clio", submodels: ["Joy", "Touch", "Icon"] },
+          { name: "Megane", submodels: ["Joy", "Touch", "Icon"] },
+          { name: "Symbol", submodels: ["Joy", "Touch"] }
+        ]
+      },
+      {
+        brand: "Fiat",
+        models: [
+          { name: "Egea", submodels: ["Urban", "Lounge", "Easy"] },
+          { name: "Linea", submodels: ["Active", "Dynamic"] },
+          { name: "Panda", submodels: ["Pop", "Easy"] }
+        ]
+      },
+      {
+        brand: "Ford",
+        models: [
+          { name: "Focus", submodels: ["TrendX", "Titanium", "Style"] },
+          { name: "Fiesta", submodels: ["Trend", "Titanium"] },
+          { name: "Kuga", submodels: ["Titanium", "ST-Line"] }
+        ]
+      },
+      {
+        brand: "Toyota",
+        models: [
+          { name: "Corolla", submodels: ["1.4 D-4D", "1.6 Valvematic", "Hybrid"] },
+          { name: "Yaris", submodels: ["1.0", "1.5 Hybrid"] },
+          { name: "C-HR", submodels: ["Hybrid", "1.2 Turbo"] }
+        ]
+      },
+      {
+        brand: "Peugeot",
+        models: [
+          { name: "208", submodels: ["Active", "Allure"] },
+          { name: "308", submodels: ["Active", "GT"] },
+          { name: "3008", submodels: ["Active", "Allure", "GT"] }
+        ]
+      },
+      {
+        brand: "Opel",
+        models: [
+          { name: "Corsa", submodels: ["Edition", "Elegance"] },
+          { name: "Astra", submodels: ["Edition", "GS Line"] },
+          { name: "Insignia", submodels: ["Business", "GS Line"] }
+        ]
+      },
+      {
+        brand: "Hyundai",
+        models: [
+          { name: "i20", submodels: ["Jump", "Style"] },
+          { name: "i10", submodels: ["Jump", "Style"] },
+          { name: "Elantra", submodels: ["Style", "Elite"] }
+        ]
+      },
+      {
+        brand: "Honda",
+        models: [
+          { name: "Civic", submodels: ["Elegance", "Executive"] },
+          { name: "Jazz", submodels: ["Elegance", "Executive"] },
+          { name: "CR-V", submodels: ["Elegance", "Executive"] }
+        ]
+      },
+      {
+        brand: "Citroen",
+        models: [
+          { name: "C3", submodels: ["Feel", "Shine"] },
+          { name: "C4", submodels: ["Feel", "Shine"] },
+          { name: "C5 Aircross", submodels: ["Feel", "Shine"] }
+        ]
+      },
+      {
+        brand: "Nissan",
+        models: [
+          { name: "Qashqai", submodels: ["Tekna", "Platinum"] },
+          { name: "Juke", submodels: ["Tekna", "Platinum"] },
+          { name: "Micra", submodels: ["Tekna", "Platinum"] }
+        ]
+      },
+      {
+        brand: "Seat",
+        models: [
+          { name: "Ibiza", submodels: ["Style", "FR"] },
+          { name: "Leon", submodels: ["Style", "FR"] },
+          { name: "Arona", submodels: ["Style", "FR"] }
+        ]
+      },
+      {
+        brand: "Skoda",
+        models: [
+          { name: "Fabia", submodels: ["Ambition", "Style"] },
+          { name: "Octavia", submodels: ["Ambition", "Style"] },
+          { name: "Superb", submodels: ["Ambition", "Style"] }
+        ]
+      },
+      {
+        brand: "Kia",
+        models: [
+          { name: "Rio", submodels: ["Cool", "Elegance"] },
+          { name: "Ceed", submodels: ["Cool", "Elegance"] },
+          { name: "Sportage", submodels: ["Cool", "Elegance"] }
+        ]
+      },
+      {
+        brand: "Dacia",
+        models: [
+          { name: "Duster", submodels: ["Comfort", "Prestige"] },
+          { name: "Sandero", submodels: ["Comfort", "Prestige"] },
+          { name: "Lodgy", submodels: ["Comfort", "Prestige"] }
+        ]
+      },
+      {
+        brand: "Volvo",
+        models: [
+          { name: "S60", submodels: ["Momentum", "Inscription"] },
+          { name: "S90", submodels: ["Momentum", "Inscription"] },
+          { name: "XC60", submodels: ["Momentum", "Inscription"] }
+        ]
+      },
+      {
+        brand: "Mini",
+        models: [
+          { name: "Cooper", submodels: ["Classic", "Salt"] },
+          { name: "Countryman", submodels: ["Classic", "Salt"] }
+        ]
+      },
+      {
+        brand: "Suzuki",
+        models: [
+          { name: "Swift", submodels: ["GL", "GLX"] },
+          { name: "Vitara", submodels: ["GL", "GLX"] }
+        ]
+      },
+      {
+        brand: "Mazda",
+        models: [
+          { name: "3", submodels: ["Power", "Power Sense"] },
+          { name: "CX-5", submodels: ["Power", "Power Sense"] }
+        ]
+      },
+      {
+        brand: "Mitsubishi",
+        models: [
+          { name: "Lancer", submodels: ["Invite", "Intense"] },
+          { name: "ASX", submodels: ["Invite", "Intense"] }
+        ]
+      },
+      {
+        brand: "Chevrolet",
+        models: [
+          { name: "Aveo", submodels: ["LS", "LT"] },
+          { name: "Cruze", submodels: ["LS", "LT"] }
+        ]
+      },
+      {
+        brand: "Subaru",
+        models: [
+          { name: "Impreza", submodels: ["1.6i", "2.0i"] },
+          { name: "Forester", submodels: ["2.0i", "2.0D"] }
+        ]
+      },
+      {
+        brand: "Jeep",
+        models: [
+          { name: "Renegade", submodels: ["Longitude", "Limited"] },
+          { name: "Compass", submodels: ["Longitude", "Limited"] }
+        ]
+      },
+      {
+        brand: "Land Rover",
+        models: [
+          { name: "Discovery", submodels: ["S", "SE"] },
+          { name: "Range Rover Evoque", submodels: ["S", "SE"] }
+        ]
+      },
+      {
+        brand: "Porsche",
+        models: [
+          { name: "Cayenne", submodels: ["Base", "S"] },
+          { name: "Macan", submodels: ["Base", "S"] }
+        ]
+      },
+      {
+        brand: "Tesla",
+        models: [
+          { name: "Model 3", submodels: ["Standard Range", "Long Range"] },
+          { name: "Model S", submodels: ["Long Range", "Plaid"] }
+        ]
+      },
+      {
+        brand: "Lexus",
+        models: [
+          { name: "IS", submodels: ["300h", "350"] },
+          { name: "RX", submodels: ["300h", "350"] }
+        ]
+      },
+      {
+        brand: "Alfa Romeo",
+        models: [
+          { name: "Giulietta", submodels: ["Progression", "Distinctive"] },
+          { name: "Stelvio", submodels: ["Super", "Veloce"] }
+        ]
+      },
+      {
+        brand: "Jaguar",
+        models: [
+          { name: "XE", submodels: ["Pure", "R-Sport"] },
+          { name: "F-Pace", submodels: ["Pure", "R-Sport"] }
+        ]
+      },
+      {
+        brand: "SsangYong",
+        models: [
+          { name: "Tivoli", submodels: ["Dream", "Quasar"] },
+          { name: "Korando", submodels: ["Dream", "Quasar"] }
+        ]
+      },
+      {
+        brand: "Isuzu",
+        models: [
+          { name: "D-Max", submodels: ["V-Go", "V-Cross"] }
+        ]
+      },
+      {
+        brand: "Smart",
+        models: [
+          { name: "Fortwo", submodels: ["Passion", "Prime"] }
+        ]
+      },
+      {
+        brand: "Chrysler",
+        models: [
+          { name: "300C", submodels: ["Limited", "Luxury"] }
+        ]
+      },
+      {
+        brand: "Infiniti",
+        models: [
+          { name: "Q50", submodels: ["Premium", "Sport"] }
+        ]
+      },
+      {
+        brand: "Saab",
+        models: [
+          { name: "9-3", submodels: ["Linear", "Vector"] }
+        ]
+      },
+      {
+        brand: "Lada",
+        models: [
+          { name: "Niva", submodels: ["Urban", "Legend"] }
+        ]
+      },
+      {
+        brand: "Proton",
+        models: [
+          { name: "Gen-2", submodels: ["Base", "Medium"] }
+        ]
+      },
+      {
+        brand: "Rover",
+        models: [
+          { name: "75", submodels: ["Classic", "Connoisseur"] }
+        ]
+      },
+      {
+        brand: "Daewoo",
+        models: [
+          { name: "Lanos", submodels: ["SX", "SE"] }
+        ]
+      },
+      {
+        brand: "Geely",
+        models: [
+          { name: "Emgrand", submodels: ["EC7", "EC8"] }
+        ]
+      },
+      {
+        brand: "Chery",
+        models: [
+          { name: "Tiggo", submodels: ["Comfort", "Luxury"] }
+        ]
+      },
+      {
+        brand: "Tata",
+        models: [
+          { name: "Indica", submodels: ["GLX", "DLX"] }
+        ]
+      },
+      {
+        brand: "BYD",
+        models: [
+          { name: "F3", submodels: ["GL", "GS"] }
+        ]
+      },
+      {
+        brand: "MG",
+        models: [
+          { name: "ZS", submodels: ["Comfort", "Luxury"] }
+        ]
+      },
+      // ... daha fazla marka/model/alt model eklenebilir
+    ];
     function showToast(msg) {
       toast.textContent = msg;
       toast.classList.add('show');
@@ -168,10 +533,9 @@
       let filtered = allCars;
       if (filterCity.value) filtered = filtered.filter(car => car.city === filterCity.value);
       if (filterGear.value) filtered = filtered.filter(car => car.gear === filterGear.value);
-      if (filterBrandModel.value.trim()) {
-        const q = filterBrandModel.value.trim().toLowerCase();
-        filtered = filtered.filter(car => (car.brand + ' ' + car.model).toLowerCase().includes(q));
-      }
+      if (filterBrandEl.value) filtered = filtered.filter(car => car.brand === filterBrandEl.value);
+      if (filterModelEl.value) filtered = filtered.filter(car => car.model === filterModelEl.value);
+      if (filterSubmodelEl.value) filtered = filtered.filter(car => car.submodel === filterSubmodelEl.value);
       if (filterMinPrice.value) filtered = filtered.filter(car => Number(car.price) >= Number(filterMinPrice.value));
       if (filterMaxPrice.value) filtered = filtered.filter(car => Number(car.price) <= Number(filterMaxPrice.value));
       renderCars(filtered);
@@ -183,9 +547,9 @@
       }
       carsListDiv.innerHTML = cars.map(car => `
         <div class="car-card">
-          ${car.img ? `<img src="${car.img}" alt="${car.brand} ${car.model}">` : '<img src="assets/car1.jpg" alt="Araç">'}
+          ${car.img ? `<img src="${car.img}" alt="${car.brand} ${car.model} ${car.submodel||''}">` : '<img src="assets/car1.jpg" alt="Araç">'}
           <div class="car-content">
-            <div class="car-title">${car.brand} ${car.model} (${car.year})</div>
+            <div class="car-title">${car.brand} ${car.model ? car.model : ''} ${car.submodel ? car.submodel : ''} (${car.year})</div>
             <div class="car-info">${car.gear} | ${car.city}, ${car.district}</div>
             <div class="car-price">${car.price} ₺/gün</div>
             <div class="car-desc">${car.desc || ''}</div>
@@ -215,10 +579,52 @@
       localStorage.setItem('cart', JSON.stringify(cart));
       showToast('Araç sepete eklendi!');
     };
-    // Filtre eventleri
-    [filterCity, filterGear, filterBrandModel, filterMinPrice, filterMaxPrice].forEach(el => {
-      el.oninput = filterCars;
-    });
+    // Marka/model select doldurma
+    function fillBrandSelect(selectEl, withAll) {
+      selectEl.innerHTML = (withAll ? '<option value="">Tümü</option>' : '<option value="">Seçiniz</option>') + CAR_BRANDS.map(b => `<option value="${b.brand}">${b.brand}</option>`).join('');
+    }
+    function fillModelSelect(selectEl, brand, withAll) {
+      selectEl.innerHTML = (withAll ? '<option value="">Tümü</option>' : '<option value="">Seçiniz</option>');
+      selectEl.disabled = !brand;
+      if (!brand) return;
+      const found = CAR_BRANDS.find(b => b.brand === brand);
+      if (found) selectEl.innerHTML += found.models.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
+    }
+    function fillSubmodelSelect(selectEl, brand, model, withAll) {
+      selectEl.innerHTML = (withAll ? '<option value="">Tümü</option>' : '<option value="">Seçiniz</option>');
+      selectEl.disabled = !(brand && model);
+      if (!(brand && model)) return;
+      const found = CAR_BRANDS.find(b => b.brand === brand);
+      if (!found) return;
+      const foundModel = found.models.find(m => m.name === model);
+      if (foundModel) selectEl.innerHTML += foundModel.submodels.map(s => `<option value="${s}">${s}</option>`).join('');
+    }
+    // Filtre için select doldurma
+    fillBrandSelect(filterBrandEl, true);
+    filterBrandEl.onchange = function() {
+      fillModelSelect(filterModelEl, filterBrandEl.value, true);
+      fillSubmodelSelect(filterSubmodelEl, filterBrandEl.value, '', true);
+      filterCars();
+    };
+    filterModelEl.onchange = function() {
+      fillSubmodelSelect(filterSubmodelEl, filterBrandEl.value, filterModelEl.value, true);
+      filterCars();
+    };
+    filterSubmodelEl.onchange = filterCars;
+    // Araç ekleme için select doldurma
+    const modalBrandEl = document.getElementById('modal-car-brand');
+    const modalModelEl = document.getElementById('modal-car-model');
+    const modalSubmodelEl = document.getElementById('modal-car-submodel');
+    fillBrandSelect(modalBrandEl, false);
+    modalBrandEl.onchange = function() {
+      fillModelSelect(modalModelEl, modalBrandEl.value, false);
+      fillSubmodelSelect(modalSubmodelEl, modalBrandEl.value, '', false);
+      modalModelEl.required = !!modalBrandEl.value;
+    };
+    modalModelEl.onchange = function() {
+      fillSubmodelSelect(modalSubmodelEl, modalBrandEl.value, modalModelEl.value, false);
+      modalSubmodelEl.required = !!modalModelEl.value;
+    };
     // Yetki kontrolü ve araç ekleme butonu
     auth.onAuthStateChanged(async user => {
       if (!user) return;
@@ -235,8 +641,9 @@
       e.preventDefault();
       const user = auth.currentUser;
       if (!user) return;
-      const brand = document.getElementById('modal-car-brand').value.trim();
-      const model = document.getElementById('modal-car-model').value.trim();
+      const brand = modalBrandEl.value;
+      const model = modalModelEl.value;
+      const submodel = modalSubmodelEl.value;
       const year = document.getElementById('modal-car-year').value.trim();
       const city = document.getElementById('modal-car-city').value.trim();
       const district = document.getElementById('modal-car-district').value.trim();
@@ -258,7 +665,7 @@
       async function saveCar(img) {
         await db.collection('cars').add({
           owner: user.uid,
-          brand, model, year, city, district, price, desc, gear, img,
+          brand, model, submodel, year, city, district, price, desc, gear, img,
           createdAt: new Date()
         });
         addCarModal.style.display = 'none';
