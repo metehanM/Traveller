@@ -418,7 +418,7 @@
       </div>
       <div class="nav">
         <button class="nav-btn active" id="tab-profile">Profilim</button>
-        <button class="nav-btn" id="tab-cars">Araçlarım</button>
+        <button class="nav-btn" id="tab-cart">Araç Sepetim</button>
         <button class="nav-btn" id="tab-settings">Ayarlar</button>
       </div>
       <div class="logout">
@@ -436,28 +436,10 @@
           <div style="font-size:15px;">Rol: <span id="summary-role" style="font-weight:600;"></span></div>
         </div>
       </section>
-      <section class="panel-section" id="section-cars">
-        <h2 style="margin-bottom:18px;">Araçlarım</h2>
-        <button id="add-car-btn" class="btn-primary" style="margin-bottom:18px;">Araç Ekle</button>
-        <div id="cars-list" class="cars-catalog"></div>
-        <div id="add-car-modal" class="modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;">
-          <div class="modal-content" style="background:#fff;padding:36px 32px;border-radius:16px;max-width:480px;width:95vw;text-align:left;box-shadow:0 4px 24px #0003;position:relative;">
-            <h3 style="color:#4318FF;margin-bottom:18px;">Yeni Araç Ekle</h3>
-            <form id="add-car-form">
-              <div style="margin-bottom:12px;"><label>Marka</label><input type="text" id="modal-car-brand" required style="width:100%"></div>
-              <div style="margin-bottom:12px;"><label>Model</label><input type="text" id="modal-car-model" required style="width:100%"></div>
-              <div style="margin-bottom:12px;"><label>Yıl</label><input type="number" id="modal-car-year" min="1980" max="2024" required style="width:100%"></div>
-              <div style="margin-bottom:12px;"><label>Vites Tipi</label><select id="modal-car-gear" required style="width:100%"><option value="">Seçiniz</option><option value="Otomatik">Otomatik</option><option value="Manuel">Manuel</option></select></div>
-              <div style="margin-bottom:12px;"><label>Şehir</label><input type="text" id="modal-car-city" required style="width:100%"></div>
-              <div style="margin-bottom:12px;"><label>İlçe</label><input type="text" id="modal-car-district" required style="width:100%"></div>
-              <div style="margin-bottom:12px;"><label>Fiyat (₺/gün)</label><input type="number" id="modal-car-price" min="1" required style="width:100%"></div>
-              <div style="margin-bottom:12px;"><label>Fotoğraf</label><input type="file" id="modal-car-img" accept="image/*" style="width:100%"></div>
-              <div style="margin-bottom:12px;"><label>Açıklama</label><textarea id="modal-car-desc" rows="2" style="width:100%"></textarea></div>
-              <button class="btn-primary" type="submit" style="width:100%;margin-top:8px;">Kaydet</button>
-              <button type="button" id="close-add-car-modal" style="width:100%;margin-top:8px;background:#ff4d4f;color:#fff;border:none;border-radius:8px;padding:10px 0;font-size:16px;cursor:pointer;">Vazgeç</button>
-            </form>
-          </div>
-        </div>
+      <section class="panel-section" id="section-cart">
+        <h2>Araç Sepetim</h2>
+        <button id="continue-shopping-btn" class="btn-primary" style="margin-bottom:18px;">Alışverişe Devam Et</button>
+        <div class="cart-list" id="cart-list"></div>
       </section>
       <section class="panel-section" id="section-settings">
         <h2>Ayarlar</h2>
@@ -510,10 +492,10 @@
     const logoutBtn = document.getElementById('logout-btn');
     // Sekmeler
     const tabProfile = document.getElementById('tab-profile');
-    const tabCars = document.getElementById('tab-cars');
+    const tabCart = document.getElementById('tab-cart');
     const tabSettings = document.getElementById('tab-settings');
     const sectionProfile = document.getElementById('section-profile');
-    const sectionCars = document.getElementById('section-cars');
+    const sectionCart = document.getElementById('section-cart');
     const sectionSettings = document.getElementById('section-settings');
     // Toast
     const toast = document.getElementById('toast');
@@ -574,8 +556,8 @@
           myRole = (doc.exists && doc.data().role) ? doc.data().role : 'user';
           // Sadece owner ve bayi araç ekleyebilsin
           if (myRole !== 'owner' && myRole !== 'bayi') {
-            tabCars.style.display = 'none';
-            sectionCars.innerHTML = '<div class="settings-section" style="text-align:center;color:#888;font-size:18px;">Sadece bayi ve owner araç ekleyebilir.</div>';
+            tabCart.style.display = 'none';
+            sectionCart.innerHTML = '<div class="settings-section" style="text-align:center;color:#888;font-size:18px;">Sadece bayi ve owner araç ekleyebilir.</div>';
           }
           // Admin paneli butonu
           const isAdmin = user.email === 'mthnrsy@gmail.com' || (doc.exists && doc.data().role === 'admin');
@@ -594,14 +576,14 @@
     });
     // Sekme geçişleri
     function setTab(tab) {
-      [tabProfile, tabCars, tabSettings].forEach(btn => btn.classList.remove('active'));
-      [sectionProfile, sectionCars, sectionSettings].forEach(sec => sec.classList.remove('active'));
+      [tabProfile, tabCart, tabSettings].forEach(btn => btn.classList.remove('active'));
+      [sectionProfile, sectionCart, sectionSettings].forEach(sec => sec.classList.remove('active'));
       if (tab === 'profile') { tabProfile.classList.add('active'); sectionProfile.classList.add('active'); }
-      if (tab === 'cars') { tabCars.classList.add('active'); sectionCars.classList.add('active'); }
+      if (tab === 'cart') { tabCart.classList.add('active'); sectionCart.classList.add('active'); }
       if (tab === 'settings') { tabSettings.classList.add('active'); sectionSettings.classList.add('active'); }
     }
     tabProfile.onclick = () => setTab('profile');
-    tabCars.onclick = () => setTab('cars');
+    tabCart.onclick = () => setTab('cart');
     tabSettings.onclick = () => setTab('settings');
     // Profil düzenleme
     editForm.onsubmit = async (e) => {
@@ -626,95 +608,42 @@
       }
     };
     logoutBtn.onclick = () => { auth.signOut().then(() => { window.location.href = 'index.html'; }); };
-    // Araçlarım paneli için kodlar
-    const carsListDiv = document.getElementById('cars-list');
-    const addCarBtn = document.getElementById('add-car-btn');
-    const addCarModal = document.getElementById('add-car-modal');
-    const closeAddCarModal = document.getElementById('close-add-car-modal');
-    const addCarForm = document.getElementById('add-car-form');
-    let myCars = [];
-
-    function renderCars() {
-      if (!myCars.length) {
-        carsListDiv.innerHTML = '<em>Henüz eklenmiş aracınız yok.</em>';
+    // Araç Sepetim fonksiyonu
+    function renderCart() {
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const cartList = document.getElementById('cart-list');
+      if (!cart.length) {
+        cartList.innerHTML = '<em>Sepetiniz boş.</em>';
         return;
       }
-      carsListDiv.innerHTML = myCars.map(car => `
-        <div class="car-card">
-          ${car.img ? `<img src="${car.img}" alt="${car.brand} ${car.model}">` : '<img src="assets/car1.jpg" alt="Araç">'}
-          <div class="car-title">${car.brand} ${car.model} (${car.year})</div>
-          <div class="car-info">${car.gear} | ${car.city}, ${car.district}</div>
-          <div class="car-info">Fiyat: ${car.price} ₺/gün</div>
-          <div class="car-desc">${car.desc || ''}</div>
-          <div class="car-actions">
-            <button onclick="editCar('${car.id}')">Düzenle</button>
-            <button class="delete-btn" onclick="deleteCar('${car.id}')">Sil</button>
+      cartList.innerHTML = cart.map((item, idx) => {
+        const car = item.car || {};
+        const carName = car.name || (car.brand ? `${car.brand} ${car.model}` : '-');
+        return `
+          <div class="cart-card">
+            <strong>${carName}</strong>
+            <span>Şehir: ${item.city || '-'} | İlçe: ${item.district || '-'}</span>
+            <span>Alış: ${item.pickup}</span>
+            <span>İade: ${item.dropoff}</span>
+            <span>Fiyat: ${car.price} ₺/gün</span>
+            <button class="remove-btn" onclick="removeFromCart(${idx})">Kaldır</button>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
-
-    async function fetchMyCars() {
-      const user = auth.currentUser;
-      if (!user) return;
-      const snap = await db.collection('cars').where('owner', '==', user.uid).get();
-      myCars = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      renderCars();
+    window.removeFromCart = function(idx) {
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      cart.splice(idx, 1);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      renderCart();
+      showToast('Araç sepetten kaldırıldı!');
     }
-
-    window.deleteCar = async function(carId) {
-      if (!confirm('Bu aracı silmek istediğinize emin misiniz?')) return;
-      await db.collection('cars').doc(carId).delete();
-      fetchMyCars();
-    }
-    window.editCar = function(carId) {
-      alert('Düzenleme özelliği yakında!');
-    }
-
-    addCarBtn.onclick = () => { addCarModal.style.display = 'flex'; };
-    closeAddCarModal.onclick = () => { addCarModal.style.display = 'none'; };
-    addCarForm.onsubmit = async function(e) {
-      e.preventDefault();
-      const user = auth.currentUser;
-      if (!user) return;
-      const brand = document.getElementById('modal-car-brand').value.trim();
-      const model = document.getElementById('modal-car-model').value.trim();
-      const year = document.getElementById('modal-car-year').value.trim();
-      const city = document.getElementById('modal-car-city').value.trim();
-      const district = document.getElementById('modal-car-district').value.trim();
-      const price = document.getElementById('modal-car-price').value.trim();
-      const desc = document.getElementById('modal-car-desc').value.trim();
-      const gear = document.getElementById('modal-car-gear').value;
-      const imgInput = document.getElementById('modal-car-img');
-      let imgData = '';
-      if (imgInput.files && imgInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = async function(evt) {
-          imgData = evt.target.result;
-          await saveCar(imgData);
-        };
-        reader.readAsDataURL(imgInput.files[0]);
-      } else {
-        await saveCar(imgData);
-      }
-      async function saveCar(img) {
-        await db.collection('cars').add({
-          owner: user.uid,
-          brand, model, year, city, district, price, desc, gear, img,
-          createdAt: new Date()
-        });
-        addCarModal.style.display = 'none';
-        addCarForm.reset();
-        fetchMyCars();
-        showToast('Araç başarıyla eklendi!');
-      }
+    document.getElementById('continue-shopping-btn').onclick = function() {
+      window.location.href = 'booking.html';
     };
-
-    // Sekme geçişinde araçlarım sekmesi açılırsa araçları çek
-    tabCars.onclick = () => { setTab('cars'); fetchMyCars(); };
-
-    // Sayfa ilk açıldığında profil sekmesi aktif olsun
+    // İlk yüklemede profil sekmesi aktif olsun
     setTab('profile');
+    renderCart();
   </script>
 </body>
 </html> 
