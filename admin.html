@@ -51,35 +51,26 @@
       if (!ROLES.includes(myRole)) return window.location.href = 'login.html';
       document.getElementById('admin-content').style.display = 'block';
       document.getElementById('admin-email').textContent = user.email + ' (' + ROLE_LABELS[myRole] + ')';
-      // Tüm kullanıcıları kimlik doğrulamalı Cloud Function'dan çek
-      async function fetchAllUsersWithAuth() {
-        const user = firebase.auth().currentUser;
-        if (!user) return [];
-        const idToken = await user.getIdToken();
-        const response = await fetch('https://us-central1-rentcars-1077b.cloudfunctions.net/getAllUsers', {
-          headers: { Authorization: 'Bearer ' + idToken }
-        });
-        const data = await response.json();
-        return data.users || [];
-      }
-      // Listeyi doldur
-      const users = await fetchAllUsersWithAuth();
-      // Firestore'daki rolleri çek
+      // Firestore'daki kullanıcıları çek ve listele
       const usersSnap = await db.collection('users').get();
-      const userRoles = {};
-      usersSnap.forEach(doc => { userRoles[doc.id] = doc.data().role; userRoles[doc.id + '_banned'] = doc.data().banned; });
+      const users = usersSnap.docs.map(doc => ({
+        uid: doc.id,
+        email: doc.data().email,
+        role: doc.data().role,
+        banned: doc.data().banned
+      }));
       // Listele
       const userListDiv = document.getElementById('user-list');
       userListDiv.innerHTML = '<h3>Kullanıcılar</h3>' +
         users.map(u => {
           const uid = u.uid;
           const email = u.email;
-          let role = userRoles[uid] || '';
+          let role = u.role || '';
           let roleLabel = ROLE_LABELS[role] || (email === 'mthnrsy@gmail.com' ? 'Owner' : 'Kullanıcı');
           let adminBadge = role ? `<b style='color:#05CD99'>(${roleLabel})</b>` : '';
           let buttons = '';
           // Ban durumu
-          const banned = userRoles[uid + '_banned'];
+          const banned = u.banned;
           // Hiyerarşiye göre atanabilir roller
           let assignableRoles = [];
           if (myRole === 'owner' && email !== user.email) assignableRoles = ROLES.filter(r => r !== role);
