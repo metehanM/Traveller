@@ -68,7 +68,7 @@
     .dark select, .dark textarea { background: #23242b; color: #fff; border: 1px solid #333; }
     .form-row { display: flex; flex-wrap: wrap; gap: 18px; margin-bottom: 14px; }
     .form-row > div { flex: 1 1 180px; min-width: 160px; }
-    @media (max-width: 700px) {
+    @media (max-width: 900px) {
       .form-row { flex-direction: column; gap: 10px; }
       .form-row > div { min-width: 0; }
     }
@@ -384,8 +384,44 @@
         }
       }
     };
-    // Araç Bul sekmesi fonksiyonları
-    const MARKA_LIST = ["Renault", "Fiat", "Ford", "Volkswagen", "Toyota", "Hyundai", "Peugeot", "Opel", "Honda", "Citroen", "BMW", "Mercedes"];
+    // Tüm markalar ve popüler modeller
+    const MARKA_MODELLER = {
+      "Renault": ["Clio", "Megane", "Symbol", "Talisman", "Captur", "Kadjar"],
+      "Fiat": ["Egea", "Linea", "Panda", "500", "Doblo", "Fiorino"],
+      "Ford": ["Focus", "Fiesta", "Mondeo", "Kuga", "Tourneo", "Transit"],
+      "Volkswagen": ["Golf", "Polo", "Passat", "Tiguan", "Jetta", "Caddy"],
+      "Toyota": ["Corolla", "Yaris", "Auris", "Camry", "RAV4", "Hilux"],
+      "Hyundai": ["i20", "i10", "Accent", "Elantra", "Tucson", "Kona"],
+      "Peugeot": ["208", "308", "3008", "2008", "508", "Partner"],
+      "Opel": ["Astra", "Corsa", "Insignia", "Mokka", "Crossland", "Combo"],
+      "Honda": ["Civic", "Jazz", "Accord", "CR-V", "HR-V"],
+      "Citroen": ["C3", "C4", "C5", "Berlingo", "C-Elysee"],
+      "BMW": ["1 Serisi", "3 Serisi", "5 Serisi", "X1", "X3", "X5"],
+      "Mercedes": ["A Serisi", "C Serisi", "E Serisi", "GLA", "GLC", "Vito"],
+      "Nissan": ["Qashqai", "Juke", "Micra", "X-Trail", "Navara"],
+      "Kia": ["Rio", "Ceed", "Sportage", "Picanto", "Sorento"],
+      "Seat": ["Ibiza", "Leon", "Arona", "Ateca", "Toledo"],
+      "Skoda": ["Octavia", "Superb", "Fabia", "Karoq", "Kodiaq"],
+      "Audi": ["A3", "A4", "A6", "Q3", "Q5", "Q7"],
+      "Mazda": ["3", "6", "CX-3", "CX-5"],
+      "Dacia": ["Duster", "Sandero", "Lodgy", "Logan"],
+      "Mini": ["Cooper", "Countryman", "Clubman"],
+      "Volvo": ["S60", "S90", "XC40", "XC60", "XC90"],
+      "Suzuki": ["Swift", "Vitara", "SX4"],
+      "Mitsubishi": ["Lancer", "ASX", "Outlander"],
+      "Chevrolet": ["Aveo", "Cruze", "Captiva"],
+      "Subaru": ["Impreza", "Forester", "XV"],
+      "Jeep": ["Renegade", "Compass", "Cherokee"],
+      "Alfa Romeo": ["Giulietta", "Stelvio", "Mito"],
+      "Porsche": ["Cayenne", "Macan", "Panamera"],
+      "Land Rover": ["Range Rover", "Discovery", "Evoque"],
+      "Tesla": ["Model S", "Model 3", "Model X", "Model Y"],
+      "Lexus": ["IS", "ES", "RX", "NX"],
+      "Jaguar": ["XE", "XF", "F-Pace"],
+      "Peugeot": ["208", "308", "3008", "2008", "508", "Partner"],
+      "Chery": ["Tiggo 8", "Tiggo 7", "Arrizo 5"]
+    };
+    const MARKA_LIST = Object.keys(MARKA_MODELLER);
     function fillBrandSelect(selectId, withAllOpt) {
       const sel = document.getElementById(selectId);
       sel.innerHTML = '';
@@ -402,13 +438,40 @@
         sel.appendChild(opt);
       });
     }
+    function fillModelSelect(selectId, brand, withAllOpt) {
+      const sel = document.getElementById(selectId);
+      sel.innerHTML = '';
+      if (withAllOpt) {
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = 'Hepsi';
+        sel.appendChild(opt);
+      }
+      if (brand && MARKA_MODELLER[brand]) {
+        MARKA_MODELLER[brand].forEach(model => {
+          const opt = document.createElement('option');
+          opt.value = model;
+          opt.textContent = model;
+          sel.appendChild(opt);
+        });
+      }
+    }
     fillBrandSelect('car-brand', false);
     fillBrandSelect('findcar-brand', true);
+    fillModelSelect('car-model', MARKA_LIST[0], false);
+    fillModelSelect('findcar-model', '', true);
+    document.getElementById('car-brand').onchange = function() {
+      fillModelSelect('car-model', this.value, false);
+    };
+    document.getElementById('findcar-brand').onchange = function() {
+      fillModelSelect('findcar-model', this.value, true);
+      renderFindCars();
+    };
     async function renderFindCars() {
       const city = document.getElementById('findcar-city').value;
       const district = document.getElementById('findcar-district').value;
       const brand = document.getElementById('findcar-brand').value;
-      const model = document.getElementById('findcar-model').value.trim().toLowerCase();
+      const model = document.getElementById('findcar-model').value;
       const year = document.getElementById('findcar-year').value.trim();
       const gear = document.getElementById('findcar-gear').value;
       const priceMin = parseInt(document.getElementById('findcar-price-min').value, 10);
@@ -422,7 +485,7 @@
       let cars = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       // Ek filtreler
       if (brand) cars = cars.filter(car => (car.brand || '') === brand);
-      if (model) cars = cars.filter(car => (car.model || '').toLowerCase().includes(model));
+      if (model) cars = cars.filter(car => (car.model || '') === model);
       if (year) cars = cars.filter(car => String(car.year) === year);
       if (gear) cars = cars.filter(car => car.gear === gear);
       if (!isNaN(priceMin)) cars = cars.filter(car => parseInt(car.price, 10) >= priceMin);
