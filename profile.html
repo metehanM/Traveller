@@ -262,14 +262,22 @@
       themeToggle.checked = true;
     }
     // Auth
+    let myRole = 'user';
     auth.onAuthStateChanged(user => {
       if (user) {
         nameEl.textContent = user.displayName || 'Kullanıcı';
         avatarEl.textContent = (user.displayName ? user.displayName[0] : 'U').toUpperCase();
         editEmail.value = user.email;
         editName.value = user.displayName || '';
-        // Firestore'da admin rolü kontrolü
+        // Firestore'da rol kontrolü
         db.collection('users').doc(user.uid).get().then(doc => {
+          myRole = (doc.exists && doc.data().role) ? doc.data().role : 'user';
+          // Sadece owner ve bayi araç ekleyebilsin
+          if (myRole !== 'owner' && myRole !== 'bayi') {
+            tabRentout.style.display = 'none';
+            sectionRentout.innerHTML = '<div class="settings-section" style="text-align:center;color:#888;font-size:18px;">Sadece bayi ve owner araç ekleyebilir.</div>';
+          }
+          // Admin paneli butonu
           const isAdmin = user.email === 'mthnrsy@gmail.com' || (doc.exists && doc.data().role === 'admin');
           if (isAdmin) {
             document.getElementById('admin-panel-btn').style.display = 'block';
@@ -293,8 +301,10 @@
       if (tab === 'payment') { tabPayment.classList.add('active'); sectionPayment.classList.add('active'); }
       if (tab === 'settings') { tabSettings.classList.add('active'); sectionSettings.classList.add('active'); }
       if (tab === 'rentout') {
-        tabRentout.classList.add('active'); sectionRentout.classList.add('active');
-        fillCitySelect('car-city', 'car-district');
+        if (myRole === 'owner' || myRole === 'bayi') {
+          tabRentout.classList.add('active'); sectionRentout.classList.add('active');
+          fillCitySelect('car-city', 'car-district');
+        }
       }
       if (tab === 'findcar') {
         tabFindcar.classList.add('active'); sectionFindcar.classList.add('active');
@@ -306,7 +316,13 @@
     tabCart.onclick = () => setTab('cart');
     tabPayment.onclick = () => setTab('payment');
     tabSettings.onclick = () => setTab('settings');
-    tabRentout.onclick = () => setTab('rentout');
+    tabRentout.onclick = () => {
+      if (myRole === 'owner' || myRole === 'bayi') {
+        setTab('rentout');
+      } else {
+        showToast('Sadece bayi ve owner araç ekleyebilir!');
+      }
+    };
     tabFindcar.onclick = () => setTab('findcar');
     // Profil düzenleme
     editForm.onsubmit = async (e) => {
@@ -367,6 +383,10 @@
     const rentoutForm = document.getElementById('rentout-form');
     rentoutForm.onsubmit = async function(e) {
       e.preventDefault();
+      if (myRole !== 'owner' && myRole !== 'bayi') {
+        showToast('Sadece bayi ve owner araç ekleyebilir!');
+        return;
+      }
       const brand = document.getElementById('car-brand').value.trim();
       const model = document.getElementById('car-model').value.trim();
       const year = document.getElementById('car-year').value.trim();
