@@ -98,6 +98,7 @@
       </div>
       <div class="logout">
         <button class="logout-btn" id="logout-btn">Çıkış Yap</button>
+        <button class="logout-btn" id="admin-panel-btn" style="background:#05CD99;display:none;margin-top:12px;">Admin Paneli</button>
       </div>
     </aside>
     <main class="panel-content">
@@ -267,6 +268,13 @@
         avatarEl.textContent = (user.displayName ? user.displayName[0] : 'U').toUpperCase();
         editEmail.value = user.email;
         editName.value = user.displayName || '';
+        // Admin paneli butonu göster
+        if (user.email === 'mthnrsy@gmail.com') {
+          document.getElementById('admin-panel-btn').style.display = 'block';
+          document.getElementById('admin-panel-btn').onclick = function() {
+            window.location.href = 'admin.html';
+          };
+        }
       } else {
         window.location.href = 'login.html';
       }
