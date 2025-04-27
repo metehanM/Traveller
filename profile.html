@@ -196,6 +196,7 @@
     <aside class="sidebar">
       <div class="avatar" id="profile-avatar">U</div>
       <div class="name" id="profile-name">Kullanıcı</div>
+      <div class="role-badge" id="profile-role" style="font-size:13px;font-weight:400;margin-bottom:18px;"></div>
       <div class="nav">
         <button class="nav-btn active" id="tab-profile">Profilim</button>
         <button class="nav-btn" id="tab-cart">Araç Sepetim</button>
@@ -377,6 +378,21 @@
         avatarEl.textContent = (user.displayName ? user.displayName[0] : 'U').toUpperCase();
         editEmail.value = user.email;
         editName.value = user.displayName || '';
+        // Rol badge'i
+        db.collection('users').doc(user.uid).get().then(doc => {
+          let role = (doc.exists && doc.data().role) ? doc.data().role : 'user';
+          let label = '';
+          let color = '#bbb';
+          if (role === 'owner') { label = 'Owner'; color = '#05CD99'; }
+          else if (role === 'bayi') { label = 'Bayi'; color = '#4318FF'; }
+          else if (role === 'admin-orta') { label = 'Admin Orta'; color = '#FFB800'; }
+          else if (role === 'admin-alt') { label = 'Admin Alt'; color = '#FF4D4F'; }
+          else { label = 'Normal Kullanıcı'; color = '#bbb'; }
+          const roleDiv = document.getElementById('profile-role');
+          roleDiv.textContent = label;
+          roleDiv.style.color = color;
+          roleDiv.style.fontWeight = '400';
+        });
         // Firestore'da rol kontrolü
         db.collection('users').doc(user.uid).get().then(doc => {
           myRole = (doc.exists && doc.data().role) ? doc.data().role : 'user';
