@@ -50,6 +50,7 @@
     <main class="panel-content">
       <section class="panel-section active" id="section-users">
         <h2>Kullanıcılar</h2>
+        <button id="unban-all-btn" style="background:#05CD99;color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:16px;cursor:pointer;margin-bottom:18px;">Tüm Banları Kaldır</button>
         <div class="user-list" id="user-list"></div>
       </section>
       <section class="panel-section" id="section-settings">
@@ -183,6 +184,17 @@
     };
     document.getElementById('close-backend-modal').onclick = function() {
       modal.style.display = 'none';
+    };
+    document.getElementById('unban-all-btn').onclick = async function() {
+      const usersSnap = await db.collection('users').get();
+      const batch = db.batch();
+      usersSnap.forEach(doc => {
+        if (doc.data().banned) {
+          batch.update(doc.ref, { banned: firebase.firestore.FieldValue.delete() });
+        }
+      });
+      await batch.commit();
+      location.reload();
     };
   </script>
 </body>
