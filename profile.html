@@ -258,6 +258,24 @@
       color: #fff;
       border: 1px solid #333;
     }
+    /* Profil özet kutusu için modern ve koyu tema uyumlu stil */
+    .profile-summary {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 2px 12px rgba(67,24,255,0.06);
+      padding: 28px 24px;
+      margin-bottom: 24px;
+      max-width: 420px;
+      margin-left: auto;
+      margin-right: auto;
+      color: #222;
+    }
+    .dark .profile-summary {
+      background: #23242b;
+      color: #fff;
+      box-shadow: 0 2px 12px rgba(67,24,255,0.10);
+      border: 1px solid #333;
+    }
   </style>
 </head>
 <body>
@@ -267,12 +285,12 @@
       <div class="name" id="profile-name">Kullanıcı</div>
       <div class="role-badge" id="profile-role" style="font-size:13px;font-weight:400;margin-bottom:18px;"></div>
       <div class="nav">
+        <button class="nav-btn" id="tab-findcar">Araç Bul</button>
+        <button class="nav-btn" id="tab-rentout">Aracını Kiraya Ver</button>
         <button class="nav-btn active" id="tab-profile">Profilim</button>
         <button class="nav-btn" id="tab-cart">Araç Sepetim</button>
         <button class="nav-btn" id="tab-payment">Ödeme Bilgileri</button>
         <button class="nav-btn" id="tab-settings">Ayarlar</button>
-        <button class="nav-btn" id="tab-rentout">Aracını Kiraya Ver</button>
-        <button class="nav-btn" id="tab-findcar">Araç Bul</button>
       </div>
       <div class="logout">
         <button class="logout-btn" id="logout-btn">Çıkış Yap</button>
