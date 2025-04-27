@@ -277,6 +277,12 @@
       box-shadow: 0 2px 12px rgba(67,24,255,0.10);
       border: 1px solid #333;
     }
+    .profile-summary div, .profile-summary span, .profile-summary label {
+      color: inherit;
+    }
+    .dark .profile-summary div, .dark .profile-summary span, .dark .profile-summary label {
+      color: #fff;
+    }
     .profile-edit, .settings-section {
       background: #fff;
       border-radius: 14px;
@@ -288,6 +294,39 @@
       color: #fff;
       box-shadow: 0 2px 12px rgba(67,24,255,0.10);
       border: 1px solid #333;
+    }
+    .profile-edit label, .settings-section label {
+      color: #222;
+    }
+    .dark .profile-edit label, .dark .settings-section label {
+      color: #fff;
+    }
+    .profile-edit input, .profile-edit select, .profile-edit textarea,
+    .settings-section input, .settings-section select, .settings-section textarea {
+      color: #222;
+      background: #fff;
+    }
+    .dark .profile-edit input, .dark .profile-edit select, .dark .profile-edit textarea,
+    .dark .settings-section input, .dark .settings-section select, .dark .settings-section textarea {
+      color: #fff;
+      background: #23242b;
+      border: 1px solid #444;
+    }
+    .profile-edit input::placeholder, .profile-edit textarea::placeholder,
+    .settings-section input::placeholder, .settings-section textarea::placeholder {
+      color: #888;
+    }
+    .dark .profile-edit input::placeholder, .dark .profile-edit textarea::placeholder,
+    .dark .settings-section input::placeholder, .dark .settings-section textarea::placeholder {
+      color: #bbb;
+    }
+    .profile-edit button, .settings-section button {
+      color: #fff;
+      background: #4318FF;
+    }
+    .dark .profile-edit button, .dark .settings-section button {
+      color: #fff;
+      background: #4318FF;
     }
   </style>
 </head>
