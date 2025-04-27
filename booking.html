@@ -9,24 +9,32 @@
   <style>
     body { font-family: 'Poppins', sans-serif; background: #F4F7FE; color: #222; margin: 0; }
     .dark body { background: #181A20; color: #fff; }
-    .main-container { max-width: 1100px; margin: 0 auto; padding: 36px 16px; }
+    .main-container { max-width: 1200px; margin: 0 auto; padding: 36px 16px; }
     .header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
-    .header-row h1 { font-size: 2rem; margin: 0; color: #4318FF; }
+    .header-row h1 { font-size: 2.2rem; margin: 0; color: #4318FF; letter-spacing: -1px; }
     .dark .header-row h1 { color: #05CD99; }
-    .btn-primary { background: #4318FF; color: #fff; border: none; border-radius: 8px; padding: 12px 28px; font-size: 17px; cursor: pointer; font-weight: 500; }
-    .btn-primary:hover { background: #2d0fb2; }
-    .dark .btn-primary { background: #05CD99; color: #181A20; }
-    .cars-catalog { display: flex; flex-wrap: wrap; gap: 24px; }
-    .car-card { background: #fff; border-radius: 14px; box-shadow: 0 2px 12px rgba(67,24,255,0.06); padding: 18px 20px; width: 320px; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; position: relative; transition: box-shadow 0.2s, background 0.2s; }
-    .car-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 10px; background: #f4f4f4; }
-    .car-card .car-title { font-size: 18px; font-weight: 600; margin-bottom: 2px; color: #4318FF; }
+    .btn-primary { background: linear-gradient(90deg,#4318FF 60%,#05CD99 100%); color: #fff; border: none; border-radius: 10px; padding: 13px 32px; font-size: 18px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px #4318ff22; transition: background 0.2s; }
+    .btn-primary:hover { background: linear-gradient(90deg,#2d0fb2 60%,#05CD99 100%); }
+    .dark .btn-primary { background: linear-gradient(90deg,#05CD99 60%,#4318FF 100%); color: #181A20; }
+    .filters-bar { display: flex; flex-wrap: wrap; gap: 18px; background: #fff; border-radius: 14px; box-shadow: 0 2px 12px rgba(67,24,255,0.06); padding: 18px 24px; margin-bottom: 32px; align-items: center; }
+    .filters-bar label { font-size: 15px; font-weight: 500; margin-right: 6px; }
+    .filters-bar select, .filters-bar input { font-size: 15px; border-radius: 8px; border: 1px solid #E6E8F0; padding: 7px 10px; background: #f9f9fb; min-width: 120px; }
+    .filters-bar input[type="number"] { width: 90px; }
+    .dark .filters-bar { background: #23242b; box-shadow: 0 2px 12px rgba(67,24,255,0.10); }
+    .dark .filters-bar select, .dark .filters-bar input { background: #23242b; color: #fff; border: 1px solid #444; }
+    .cars-catalog { display: flex; flex-wrap: wrap; gap: 28px; justify-content: flex-start; }
+    .car-card { background: #fff; border-radius: 18px; box-shadow: 0 4px 18px rgba(67,24,255,0.10); padding: 0 0 18px 0; width: 330px; display: flex; flex-direction: column; align-items: flex-start; gap: 0; position: relative; transition: box-shadow 0.2s, background 0.2s; overflow: hidden; }
+    .car-card img { width: 100%; height: 170px; object-fit: cover; border-radius: 18px 18px 0 0; background: #f4f4f4; }
+    .car-card .car-content { padding: 18px 20px 0 20px; width: 100%; }
+    .car-card .car-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; color: #4318FF; letter-spacing: -0.5px; }
     .car-card .car-info { font-size: 15px; color: #444; margin-bottom: 2px; }
-    .car-card .car-desc { font-size: 14px; color: #666; margin-bottom: 4px; }
-    .car-card .car-actions { display: flex; gap: 10px; margin-top: 8px; }
-    .car-card .car-actions button { background: #4318FF; color: #fff; border: none; border-radius: 6px; padding: 6px 14px; cursor: pointer; font-size: 15px; }
+    .car-card .car-desc { font-size: 14px; color: #666; margin-bottom: 8px; }
+    .car-card .car-actions { display: flex; gap: 10px; margin-top: 10px; }
+    .car-card .car-actions button { background: #4318FF; color: #fff; border: none; border-radius: 8px; padding: 8px 18px; cursor: pointer; font-size: 16px; font-weight: 500; box-shadow: 0 2px 8px #4318ff22; }
     .car-card .car-actions .delete-btn { background: #ff4d4f; }
-    @media (max-width: 900px) { .cars-catalog { flex-direction: column; gap: 14px; } .car-card { width: 100%; } }
-    .dark .car-card { background: #23242b; color: #fff; box-shadow: 0 2px 12px rgba(67,24,255,0.10); }
+    .car-card .car-price { font-size: 17px; font-weight: 600; color: #05CD99; margin-bottom: 6px; }
+    @media (max-width: 900px) { .cars-catalog { flex-direction: column; gap: 18px; } .car-card { width: 100%; } }
+    .dark .car-card { background: #23242b; color: #fff; box-shadow: 0 4px 18px rgba(67,24,255,0.18); }
     .dark .car-card .car-title { color: #05CD99; }
     .dark .car-card .car-info { color: #bbb; }
     .dark .car-card .car-desc { color: #aaa; }
@@ -42,14 +50,47 @@
     .modal-content .close-btn { background: #ff4d4f; color: #fff; }
     .toast { position: fixed; top: -80px; left: 50%; transform: translateX(-50%); background: #4318FF; color: #fff; padding: 18px 36px; border-radius: 12px; font-size: 17px; font-weight: 500; box-shadow: 0 4px 24px rgba(67,24,255,0.12); z-index: 9999; opacity: 0; transition: top 0.5s, opacity 0.5s; }
     .toast.show { top: 32px; opacity: 1; }
+    .switch { position: relative; display: inline-block; width: 48px; height: 28px; vertical-align: middle; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 28px; }
+    .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: #4318FF; }
+    input:checked + .slider:before { transform: translateX(20px); }
   </style>
 </head>
 <body>
   <div class="main-container">
     <div class="header-row">
       <h1>Araçlar</h1>
-      <button id="add-car-btn" class="btn-primary" style="display:none;">Araç Ekle</button>
+      <div style="display:flex;align-items:center;gap:18px;">
+        <label class="switch" style="margin-right:8px;">
+          <input type="checkbox" id="theme-toggle">
+          <span class="slider"></span>
+        </label>
+        <button id="add-car-btn" class="btn-primary" style="display:none;">Araç Ekle</button>
+      </div>
     </div>
+    <form class="filters-bar" id="filters-form" onsubmit="return false;">
+      <label>Şehir
+        <select id="filter-city">
+          <option value="">Tümü</option>
+        </select>
+      </label>
+      <label>Vites
+        <select id="filter-gear">
+          <option value="">Tümü</option>
+          <option value="Otomatik">Otomatik</option>
+          <option value="Manuel">Manuel</option>
+        </select>
+      </label>
+      <label>Marka/Model
+        <input type="text" id="filter-brandmodel" placeholder="Marka veya model">
+      </label>
+      <label>Fiyat
+        <input type="number" id="filter-minprice" placeholder="Min" min="0"> -
+        <input type="number" id="filter-maxprice" placeholder="Maks" min="0">
+      </label>
+    </form>
     <div id="cars-list" class="cars-catalog"></div>
     <div id="add-car-modal" class="modal">
       <div class="modal-content">
@@ -93,6 +134,12 @@
     const closeAddCarModal = document.getElementById('close-add-car-modal');
     const addCarForm = document.getElementById('add-car-form');
     const toast = document.getElementById('toast');
+    // Filtreler
+    const filterCity = document.getElementById('filter-city');
+    const filterGear = document.getElementById('filter-gear');
+    const filterBrandModel = document.getElementById('filter-brandmodel');
+    const filterMinPrice = document.getElementById('filter-minprice');
+    const filterMaxPrice = document.getElementById('filter-maxprice');
     let allCars = [];
     let myRole = 'user';
     function showToast(msg) {
@@ -100,20 +147,42 @@
       toast.classList.add('show');
       setTimeout(() => { toast.classList.remove('show'); }, 2200);
     }
-    function renderCars() {
-      if (!allCars.length) {
-        carsListDiv.innerHTML = '<em>Henüz eklenmiş araç yok.</em>';
+    function getUniqueCities(cars) {
+      const cities = cars.map(car => car.city).filter(Boolean);
+      return [...new Set(cities)].sort();
+    }
+    function renderCityOptions() {
+      const cities = getUniqueCities(allCars);
+      filterCity.innerHTML = '<option value="">Tümü</option>' + cities.map(city => `<option value="${city}">${city}</option>`).join('');
+    }
+    function filterCars() {
+      let filtered = allCars;
+      if (filterCity.value) filtered = filtered.filter(car => car.city === filterCity.value);
+      if (filterGear.value) filtered = filtered.filter(car => car.gear === filterGear.value);
+      if (filterBrandModel.value.trim()) {
+        const q = filterBrandModel.value.trim().toLowerCase();
+        filtered = filtered.filter(car => (car.brand + ' ' + car.model).toLowerCase().includes(q));
+      }
+      if (filterMinPrice.value) filtered = filtered.filter(car => Number(car.price) >= Number(filterMinPrice.value));
+      if (filterMaxPrice.value) filtered = filtered.filter(car => Number(car.price) <= Number(filterMaxPrice.value));
+      renderCars(filtered);
+    }
+    function renderCars(cars = allCars) {
+      if (!cars.length) {
+        carsListDiv.innerHTML = '<em>Aradığınız kriterlere uygun araç bulunamadı.</em>';
         return;
       }
-      carsListDiv.innerHTML = allCars.map(car => `
+      carsListDiv.innerHTML = cars.map(car => `
         <div class="car-card">
           ${car.img ? `<img src="${car.img}" alt="${car.brand} ${car.model}">` : '<img src="assets/car1.jpg" alt="Araç">'}
-          <div class="car-title">${car.brand} ${car.model} (${car.year})</div>
-          <div class="car-info">${car.gear} | ${car.city}, ${car.district}</div>
-          <div class="car-info">Fiyat: ${car.price} ₺/gün</div>
-          <div class="car-desc">${car.desc || ''}</div>
-          <div class="car-actions">
-            <button onclick="addToCartFromBooking('${car.id}')">Sepete Ekle</button>
+          <div class="car-content">
+            <div class="car-title">${car.brand} ${car.model} (${car.year})</div>
+            <div class="car-info">${car.gear} | ${car.city}, ${car.district}</div>
+            <div class="car-price">${car.price} ₺/gün</div>
+            <div class="car-desc">${car.desc || ''}</div>
+            <div class="car-actions">
+              <button onclick="addToCartFromBooking('${car.id}')">Sepete Ekle</button>
+            </div>
           </div>
         </div>
       `).join('');
@@ -121,7 +190,8 @@
     async function fetchAllCars() {
       const snap = await db.collection('cars').orderBy('createdAt', 'desc').get();
       allCars = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      renderCars();
+      renderCityOptions();
+      filterCars();
     }
     window.addToCartFromBooking = async function(carId) {
       const doc = await db.collection('cars').doc(carId).get();
@@ -136,6 +206,10 @@
       localStorage.setItem('cart', JSON.stringify(cart));
       showToast('Araç sepete eklendi!');
     };
+    // Filtre eventleri
+    [filterCity, filterGear, filterBrandModel, filterMinPrice, filterMaxPrice].forEach(el => {
+      el.oninput = filterCars;
+    });
     // Yetki kontrolü ve araç ekleme butonu
     auth.onAuthStateChanged(async user => {
       if (!user) return;
@@ -184,6 +258,23 @@
         showToast('Araç başarıyla eklendi!');
       }
     };
+    // Tema
+    const themeToggle = document.getElementById('theme-toggle');
+    function setTheme(dark) {
+      if (dark) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      }
+    }
+    themeToggle.onchange = () => setTheme(themeToggle.checked);
+    // Sayfa açılışında tema yükle
+    if (localStorage.getItem('theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+      themeToggle.checked = true;
+    }
   </script>
 </body>
 </html> 
