@@ -145,6 +145,50 @@
       color: #fff;
       border: 1px solid #333;
     }
+    /* Araç Sepetim (kiralama) için modern ve responsive stil */
+    #section-cart .cart-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 2px 12px rgba(67,24,255,0.06);
+      padding: 18px 12px 8px 12px;
+      margin-bottom: 18px;
+      overflow-x: auto;
+      scrollbar-width: thin;
+    }
+    #section-cart .cart-card {
+      min-width: 220px;
+      flex: 1 1 260px;
+      background: #f9f9fb;
+      border-radius: 12px;
+      box-shadow: 0 1px 6px rgba(67,24,255,0.04);
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+    }
+    @media (max-width: 900px) {
+      #section-cart .cart-list {
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px 4px 4px 4px;
+      }
+      #section-cart .cart-card {
+        min-width: 0;
+      }
+    }
+    .dark #section-cart .cart-list {
+      background: #23242b;
+      box-shadow: 0 2px 12px rgba(67,24,255,0.10);
+    }
+    .dark #section-cart .cart-card {
+      background: #23242b;
+      color: #fff;
+      border: 1px solid #333;
+    }
   </style>
 </head>
 <body>
@@ -329,7 +373,7 @@
     let myRole = 'user';
     auth.onAuthStateChanged(user => {
       if (user) {
-        nameEl.textContent = user.displayName || 'Kullanıcı';
+        nameEl.textContent = 'Merhaba ' + (user.displayName ? user.displayName : user.email.split('@')[0]);
         avatarEl.textContent = (user.displayName ? user.displayName[0] : 'U').toUpperCase();
         editEmail.value = user.email;
         editName.value = user.displayName || '';
