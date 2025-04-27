@@ -189,6 +189,65 @@
       color: #fff;
       border: 1px solid #333;
     }
+    /* Araç Kiraya Ver (rentout) için modern ve responsive stil */
+    #section-rentout .modern-form {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(67,24,255,0.10);
+      padding: 28px 24px;
+      margin-bottom: 24px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #section-rentout .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin-bottom: 14px;
+    }
+    #section-rentout .form-row > div {
+      flex: 1 1 180px;
+      min-width: 160px;
+    }
+    @media (max-width: 900px) {
+      #section-rentout .modern-form {
+        padding: 16px 8px;
+      }
+      #section-rentout .form-row {
+        flex-direction: column;
+        gap: 10px;
+      }
+      #section-rentout .form-row > div {
+        min-width: 0;
+      }
+    }
+    #section-rentout label {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+    #section-rentout input,
+    #section-rentout select,
+    #section-rentout textarea {
+      font-size: 15px;
+      padding: 7px 8px;
+      border-radius: 8px;
+      border: 1px solid #E6E8F0;
+      background: #f9f9fb;
+      margin-bottom: 0;
+    }
+    .dark #section-rentout .modern-form {
+      background: #23242b;
+      box-shadow: 0 2px 12px rgba(67,24,255,0.10);
+    }
+    .dark #section-rentout input,
+    .dark #section-rentout select,
+    .dark #section-rentout textarea {
+      background: #23242b;
+      color: #fff;
+      border: 1px solid #333;
+    }
   </style>
 </head>
 <body>
@@ -248,7 +307,7 @@
       </section>
       <section class="panel-section" id="section-rentout">
         <h2>Aracını Kiraya Ver</h2>
-        <form id="rentout-form" class="settings-section modern-form" enctype="multipart/form-data">
+        <form id="rentout-form" class="modern-form" enctype="multipart/form-data">
           <div class="form-row">
             <div><label>Marka</label><select id="car-brand" required></select></div>
             <div><label>Model</label><select id="car-model" required></select></div>
