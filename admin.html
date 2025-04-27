@@ -36,30 +36,50 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
+    // Rol hiyerarşisi
+    const ROLES = ['owner', 'admin-orta', 'admin-alt'];
+    const ROLE_LABELS = { 'owner': 'Owner', 'admin-orta': 'Orta Düzey', 'admin-alt': 'Alt Düzey' };
     // Sadece adminler erişebilsin
     auth.onAuthStateChanged(async user => {
       if (!user) return window.location.href = 'login.html';
       // Kullanıcı Firestore'da admin mi kontrol et
       const userDoc = await db.collection('users').doc(user.uid).get();
-      const isAdmin = user.email === 'mthnrsy@gmail.com' || (userDoc.exists && userDoc.data().role === 'admin');
-      if (!isAdmin) return window.location.href = 'login.html';
+      let myRole = 'admin-alt';
+      if (user.email === 'mthnrsy@gmail.com') myRole = 'owner';
+      else if (userDoc.exists && userDoc.data().role) myRole = userDoc.data().role;
+      if (!ROLES.includes(myRole)) return window.location.href = 'login.html';
       document.getElementById('admin-content').style.display = 'block';
-      document.getElementById('admin-email').textContent = user.email;
+      document.getElementById('admin-email').textContent = user.email + ' (' + ROLE_LABELS[myRole] + ')';
       // Tüm kullanıcıları listele
       const usersSnap = await db.collection('users').get();
       const userListDiv = document.getElementById('user-list');
       userListDiv.innerHTML = '<h3>Kullanıcılar</h3>' +
         Array.from(usersSnap.docs).map(doc => {
           const d = doc.data();
-          const isAdminUser = d.role === 'admin' || d.email === 'mthnrsy@gmail.com';
+          const uid = doc.id;
+          let role = d.role || '';
+          let roleLabel = ROLE_LABELS[role] || (d.email === 'mthnrsy@gmail.com' ? 'Owner' : 'Kullanıcı');
+          let adminBadge = role ? `<b style='color:#05CD99'>(${roleLabel})</b>` : '';
+          let buttons = '';
+          // Owner her role atayabilir
+          if (myRole === 'owner' && d.email !== user.email) {
+            buttons = ROLES.map(r => r !== role ? `<button onclick="setRole('${uid}','${r}')" style="background:#05CD99;color:#fff;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;margin-left:4px;">${ROLE_LABELS[r]}</button>` : '').join('');
+          }
+          // Orta düzey sadece admin-alt atayabilir
+          else if (myRole === 'admin-orta' && d.email !== user.email && role !== 'owner') {
+            if (role !== 'admin-alt') {
+              buttons = `<button onclick="setRole('${uid}','admin-alt')" style="background:#05CD99;color:#fff;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;">Alt Düzey Yap</button>`;
+            }
+          }
+          // Alt düzey sadece liste görebilir
           return `<div style="display:flex;align-items:center;justify-content:space-between;margin:8px 0;padding:8px 0;border-bottom:1px solid #333;">
-            <span>${d.email}${isAdminUser ? ' <b style=\'color:#05CD99\'>(Admin)</b>' : ''}</span>
-            ${!isAdminUser ? `<button onclick="makeAdmin('${doc.id}')" style="background:#05CD99;color:#fff;border:none;border-radius:6px;padding:6px 16px;cursor:pointer;">Admin Yap</button>` : ''}
+            <span>${d.email} ${adminBadge}</span>
+            <span>${buttons}</span>
           </div>`;
         }).join('');
     });
-    window.makeAdmin = async function(uid) {
-      await db.collection('users').doc(uid).set({ role: 'admin' }, { merge: true });
+    window.setRole = async function(uid, role) {
+      await db.collection('users').doc(uid).set({ role }, { merge: true });
       location.reload();
     };
     document.getElementById('logout-btn').onclick = function() {
