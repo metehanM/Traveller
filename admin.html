@@ -17,10 +17,12 @@
     <h1>Admin Paneli</h1>
     <p>Hoşgeldin <span id="admin-email"></span>!</p>
     <p>Burada sadece adminlerin görebileceği özel içerikler yer alacak.</p>
+    <div id="user-list"></div>
     <button class="logout-btn" id="logout-btn">Çıkış Yap</button>
   </div>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCRArf2VPbZuvLueY2qm2Lz9GhQXLvhzxY",
@@ -33,15 +35,33 @@
     };
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-    const ADMIN_EMAIL = 'mthnrsy@gmail.com';
-    auth.onAuthStateChanged(user => {
-      if (!user || user.email !== ADMIN_EMAIL) {
-        window.location.href = 'login.html';
-      } else {
-        document.getElementById('admin-content').style.display = 'block';
-        document.getElementById('admin-email').textContent = user.email;
-      }
+    const db = firebase.firestore();
+    // Sadece adminler erişebilsin
+    auth.onAuthStateChanged(async user => {
+      if (!user) return window.location.href = 'login.html';
+      // Kullanıcı Firestore'da admin mi kontrol et
+      const userDoc = await db.collection('users').doc(user.uid).get();
+      const isAdmin = user.email === 'mthnrsy@gmail.com' || (userDoc.exists && userDoc.data().role === 'admin');
+      if (!isAdmin) return window.location.href = 'login.html';
+      document.getElementById('admin-content').style.display = 'block';
+      document.getElementById('admin-email').textContent = user.email;
+      // Tüm kullanıcıları listele
+      const usersSnap = await db.collection('users').get();
+      const userListDiv = document.getElementById('user-list');
+      userListDiv.innerHTML = '<h3>Kullanıcılar</h3>' +
+        Array.from(usersSnap.docs).map(doc => {
+          const d = doc.data();
+          const isAdminUser = d.role === 'admin' || d.email === 'mthnrsy@gmail.com';
+          return `<div style="display:flex;align-items:center;justify-content:space-between;margin:8px 0;padding:8px 0;border-bottom:1px solid #333;">
+            <span>${d.email}${isAdminUser ? ' <b style=\'color:#05CD99\'>(Admin)</b>' : ''}</span>
+            ${!isAdminUser ? `<button onclick="makeAdmin('${doc.id}')" style="background:#05CD99;color:#fff;border:none;border-radius:6px;padding:6px 16px;cursor:pointer;">Admin Yap</button>` : ''}
+          </div>`;
+        }).join('');
     });
+    window.makeAdmin = async function(uid) {
+      await db.collection('users').doc(uid).set({ role: 'admin' }, { merge: true });
+      location.reload();
+    };
     document.getElementById('logout-btn').onclick = function() {
       auth.signOut().then(() => window.location.href = 'login.html');
     };
