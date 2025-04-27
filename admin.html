@@ -71,8 +71,8 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-    const ROLES = ['owner', 'admin-orta', 'admin-alt', 'bayi'];
-    const ROLE_LABELS = { 'owner': 'Owner', 'admin-orta': 'Orta Düzey', 'admin-alt': 'Alt Düzey', 'bayi': 'Bayi' };
+    const ROLES = ['owner', 'admin-orta', 'admin-alt', 'bayi', 'user'];
+    const ROLE_LABELS = { 'owner': 'Owner', 'admin-orta': 'Orta Düzey', 'admin-alt': 'Alt Düzey', 'bayi': 'Bayi', 'user': 'Normal Kullanıcı' };
     // Sekme geçişleri
     const tabUsers = document.getElementById('tab-users');
     const tabSettings = document.getElementById('tab-settings');
@@ -88,7 +88,9 @@
       // Firestore'da kullanıcı var mı kontrol et, yoksa ekle
       const userDoc = await db.collection('users').doc(user.uid).get();
       if (!userDoc.exists) {
-        await db.collection('users').doc(user.uid).set({ email: user.email }, { merge: true });
+        await db.collection('users').doc(user.uid).set({ email: user.email, role: 'user' }, { merge: true });
+      } else if (!userDoc.data().role) {
+        await db.collection('users').doc(user.uid).set({ role: 'user' }, { merge: true });
       }
       let myRole = 'admin-alt';
       if (user.email === 'mthnrsy@gmail.com') myRole = 'owner';
@@ -99,7 +101,7 @@
       const users = usersSnap.docs.map(doc => ({
         uid: doc.id,
         email: doc.data().email,
-        role: doc.data().role,
+        role: doc.data().role || 'user',
         banned: doc.data().banned
       }));
       const userListDiv = document.getElementById('user-list');
@@ -107,7 +109,7 @@
         users.map(u => {
           const uid = u.uid;
           const email = u.email;
-          let role = u.role || '';
+          let role = u.role || 'user';
           let roleLabel = ROLE_LABELS[role] || (email === 'mthnrsy@gmail.com' ? 'Owner' : 'Kullanıcı');
           let adminBadge = role ? `<span class='badge'>${roleLabel}</span>` : '';
           let buttons = '';
@@ -124,8 +126,8 @@
           // Hiyerarşik ban yetkisi
           const myIdx = ROLES.indexOf(myRole);
           const userIdx = ROLES.indexOf(role);
-          // Sadece alt düzey kullanıcıyı banlayabilsin
-          if (myIdx < userIdx && email !== user.email) {
+          // Sadece alt düzey kullanıcıyı banlayabilsin, 'user' ve 'bayi' kimseyi banlayamasın
+          if (myIdx < userIdx && myRole !== 'user' && myRole !== 'bayi' && email !== user.email) {
             if (!banned) {
               buttons += `<button class='ban' onclick=\"banUser('${uid}')\" style=\"margin-left:6px;\">Banla</button>`;
             } else {
