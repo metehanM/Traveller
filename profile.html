@@ -66,6 +66,17 @@
     .dark .no-cars { color: #bbb; }
     select, textarea { font-family: inherit; font-size: 16px; border-radius: 8px; border: 1px solid #E6E8F0; padding: 10px; margin-bottom: 12px; }
     .dark select, .dark textarea { background: #23242b; color: #fff; border: 1px solid #333; }
+    .form-row { display: flex; gap: 18px; margin-bottom: 14px; }
+    .form-row > div { flex: 1; }
+    .modern-form { background: var(--card, #fff); border-radius: 16px; box-shadow: 0 2px 12px rgba(67,24,255,0.06); padding: 28px 24px; margin-bottom: 24px; }
+    .dark .modern-form { background: var(--card-dark, #23242b); }
+    .modern-car-list .car-card { background: var(--card, #fff); border-radius: 16px; box-shadow: 0 2px 12px rgba(67,24,255,0.10); padding: 18px 24px; margin-bottom: 18px; display: flex; align-items: center; gap: 20px; transition: box-shadow 0.2s, background 0.2s; }
+    .modern-car-list .car-card img { width: 110px; height: 80px; border-radius: 10px; object-fit: cover; background: #fff; }
+    .modern-car-list .car-info { flex: 1; }
+    .modern-car-list .car-info h3 { margin: 0 0 8px 0; font-size: 18px; color: #222; }
+    .modern-car-list .car-info span { color: #666; font-size: 15px; }
+    .dark .modern-car-list .car-card { background: var(--card-dark, #23242b); color: #fff; }
+    .dark .modern-car-list .car-info h3, .dark .modern-car-list .car-info span { color: #fff; }
   </style>
 </head>
 <body>
@@ -123,61 +134,61 @@
       </section>
       <section class="panel-section" id="section-rentout">
         <h2>Aracını Kiraya Ver</h2>
-        <form id="rentout-form" class="settings-section" enctype="multipart/form-data">
-          <label>Marka</label>
-          <input type="text" id="car-brand" required>
-          <label>Model</label>
-          <input type="text" id="car-model" required>
-          <label>Yıl</label>
-          <input type="number" id="car-year" min="1980" max="2024" required>
-          <label>Şehir</label>
-          <select id="car-city" required>
-            <option value="">Şehir seçin</option>
-          </select>
-          <label>İlçe</label>
-          <select id="car-district" required>
-            <option value="">İlçe seçin</option>
-          </select>
-          <label>Fiyat (₺/gün)</label>
-          <input type="number" id="car-price" min="1" required>
+        <form id="rentout-form" class="settings-section modern-form" enctype="multipart/form-data">
+          <div class="form-row">
+            <div><label>Marka</label><input type="text" id="car-brand" required></div>
+            <div><label>Model</label><input type="text" id="car-model" required></div>
+          </div>
+          <div class="form-row">
+            <div><label>Yıl</label><input type="number" id="car-year" min="1980" max="2024" required></div>
+            <div><label>Vites Tipi</label>
+              <select id="car-gear" required>
+                <option value="">Seçiniz</option>
+                <option value="Otomatik">Otomatik</option>
+                <option value="Manuel">Manuel</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div><label>Şehir</label><select id="car-city" required><option value="">Şehir seçin</option></select></div>
+            <div><label>İlçe</label><select id="car-district" required><option value="">İlçe seçin</option></select></div>
+          </div>
+          <div class="form-row">
+            <div><label>Fiyat (₺/gün)</label><input type="number" id="car-price" min="1" required></div>
+            <div><label>Fotoğraf (isteğe bağlı)</label><input type="file" id="car-img" accept="image/*"></div>
+          </div>
           <label>Açıklama</label>
           <textarea id="car-desc" rows="2"></textarea>
-          <label>Vites Tipi</label>
-          <select id="car-gear" required>
-            <option value="">Seçiniz</option>
-            <option value="Otomatik">Otomatik</option>
-            <option value="Manuel">Manuel</option>
-          </select>
-          <label>Fotoğraf (isteğe bağlı)</label>
-          <input type="file" id="car-img" accept="image/*">
           <button class="btn-primary" type="submit" style="margin-top:16px;">Aracı Ekle</button>
         </form>
       </section>
       <section class="panel-section" id="section-findcar">
         <h2>Araç Bul</h2>
-        <form class="booking-form" id="findcar-form">
-          <div>
-            <label for="findcar-city">Şehir</label>
-            <select id="findcar-city" required>
-              <option value="">Şehir seçin</option>
-            </select>
+        <form class="booking-form modern-form" id="findcar-form">
+          <div class="form-row">
+            <div><label for="findcar-city">Şehir</label><select id="findcar-city" required><option value="">Şehir seçin</option></select></div>
+            <div><label for="findcar-district">İlçe</label><select id="findcar-district" required><option value="">İlçe seçin</option></select></div>
           </div>
-          <div>
-            <label for="findcar-district">İlçe</label>
-            <select id="findcar-district" required>
-              <option value="">İlçe seçin</option>
-            </select>
+          <div class="form-row">
+            <div><label for="findcar-brand">Marka</label><input type="text" id="findcar-brand" placeholder="Opsiyonel"></div>
+            <div><label for="findcar-model">Model</label><input type="text" id="findcar-model" placeholder="Opsiyonel"></div>
           </div>
-          <div>
-            <label for="findcar-pickup">Alış Tarihi</label>
-            <input type="date" id="findcar-pickup" required>
+          <div class="form-row">
+            <div><label for="findcar-year">Yıl</label><input type="number" id="findcar-year" min="1980" max="2024" placeholder="Opsiyonel"></div>
+            <div><label for="findcar-gear">Vites Tipi</label>
+              <select id="findcar-gear"><option value="">Hepsi</option><option value="Otomatik">Otomatik</option><option value="Manuel">Manuel</option></select>
+            </div>
           </div>
-          <div>
-            <label for="findcar-dropoff">İade Tarihi</label>
-            <input type="date" id="findcar-dropoff" required>
+          <div class="form-row">
+            <div><label for="findcar-price-min">Min Fiyat</label><input type="number" id="findcar-price-min" min="0" placeholder="₺"></div>
+            <div><label for="findcar-price-max">Max Fiyat</label><input type="number" id="findcar-price-max" min="0" placeholder="₺"></div>
+          </div>
+          <div class="form-row">
+            <div><label for="findcar-pickup">Alış Tarihi</label><input type="date" id="findcar-pickup" required></div>
+            <div><label for="findcar-dropoff">İade Tarihi</label><input type="date" id="findcar-dropoff" required></div>
           </div>
         </form>
-        <div class="car-list" id="findcar-list"></div>
+        <div class="car-list modern-car-list" id="findcar-list"></div>
         <div class="no-cars" id="findcar-nocars" style="display:none;">Bölgenizde uygun araç bulunamadı.</div>
       </section>
     </main>
@@ -373,13 +384,26 @@
     async function renderFindCars() {
       const city = document.getElementById('findcar-city').value;
       const district = document.getElementById('findcar-district').value;
+      const brand = document.getElementById('findcar-brand').value.trim().toLowerCase();
+      const model = document.getElementById('findcar-model').value.trim().toLowerCase();
+      const year = document.getElementById('findcar-year').value.trim();
+      const gear = document.getElementById('findcar-gear').value;
+      const priceMin = parseInt(document.getElementById('findcar-price-min').value, 10);
+      const priceMax = parseInt(document.getElementById('findcar-price-max').value, 10);
       const carList = document.getElementById('findcar-list');
       const noCars = document.getElementById('findcar-nocars');
       let query = db.collection('cars');
       if (city) query = query.where('city', '==', city);
       if (district) query = query.where('district', '==', district);
       const snapshot = await query.get();
-      const cars = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      let cars = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      // Ek filtreler
+      if (brand) cars = cars.filter(car => (car.brand || '').toLowerCase().includes(brand));
+      if (model) cars = cars.filter(car => (car.model || '').toLowerCase().includes(model));
+      if (year) cars = cars.filter(car => String(car.year) === year);
+      if (gear) cars = cars.filter(car => car.gear === gear);
+      if (!isNaN(priceMin)) cars = cars.filter(car => parseInt(car.price, 10) >= priceMin);
+      if (!isNaN(priceMax)) cars = cars.filter(car => parseInt(car.price, 10) <= priceMax);
       let filtered = cars;
       if (!city) filtered = [];
       if (filtered.length === 0) {
@@ -389,15 +413,15 @@
       }
       noCars.style.display = 'none';
       carList.innerHTML = filtered.map((car, i) => `
-        <div class=\"car-card\">
-          ${car.img ? `<img src=\"${car.img}\" alt=\"${car.brand} ${car.model}\">` : ''}
-          <div class=\"car-info\">
+        <div class="car-card">
+          ${car.img ? `<img src="${car.img}" alt="${car.brand} ${car.model}">` : ''}
+          <div class="car-info">
             <h3>${car.brand} ${car.model} (${car.year})</h3>
             <span>${car.gear} | ${car.city}, ${car.district}</span><br>
             <span>Fiyat: ${car.price} ₺/gün</span><br>
             <span>${car.desc || ''}</span>
           </div>
-          <button class=\"btn-rent\" onclick=\"addToCartFromFindFirestore('${car.id}')\">Sepete Ekle</button>
+          <button class="btn-rent" onclick="addToCartFromFindFirestore('${car.id}')">Sepete Ekle</button>
         </div>
       `).join('');
     }
@@ -464,10 +488,11 @@
     // Sayfa yüklenince bir kez doldur
     fillCitySelect('car-city', 'car-district');
     fillCitySelect('findcar-city', 'findcar-district');
-    // Araç bulma formunda şehir/ilçe değişince Firestore'dan çek
-    ['findcar-city','findcar-district'].forEach(id => {
+    // Araç bulma formunda şehir/ilçe ve diğer filtreler değişince Firestore'dan çek
+    ['findcar-city','findcar-district','findcar-brand','findcar-model','findcar-year','findcar-gear','findcar-price-min','findcar-price-max'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.onchange = renderFindCars;
+      if (el && el.tagName === 'INPUT') el.oninput = renderFindCars;
     });
     // Sayfa ilk açıldığında araçları çek
     renderFindCars();
