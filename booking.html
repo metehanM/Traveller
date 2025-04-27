@@ -56,12 +56,21 @@
     .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
     input:checked + .slider { background-color: #4318FF; }
     input:checked + .slider:before { transform: translateX(20px); }
+    .btn-back-profile { background: #f4f4f4; color: #4318FF; border: none; border-radius: 8px; font-weight: 600; box-shadow: 0 2px 8px #4318ff11; transition: background 0.2s, color 0.2s; }
+    .btn-back-profile:hover { background: #e0e0ff; color: #2d0fb2; }
+    .dark .btn-back-profile { background: #23242b; color: #05CD99; box-shadow: 0 2px 8px #05cd9911; }
+    .dark .btn-back-profile:hover { background: #181A20; color: #fff; }
   </style>
 </head>
 <body>
   <div class="main-container">
     <div class="header-row">
-      <h1>Araçlar</h1>
+      <div style="display:flex;align-items:center;gap:18px;">
+        <button id="back-profile-btn" class="btn-back-profile" style="font-size:16px;padding:10px 20px;border-radius:8px;border:none;background:#f4f4f4;color:#4318FF;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;box-shadow:0 2px 8px #4318ff11;transition:background 0.2s;">
+          <span style="font-size:20px;">&#8592;</span> Profilim
+        </button>
+        <h1 style="margin:0 0 0 12px;">Araçlar</h1>
+      </div>
       <div style="display:flex;align-items:center;gap:18px;">
         <label class="switch" style="margin-right:8px;">
           <input type="checkbox" id="theme-toggle">
@@ -275,6 +284,10 @@
       document.documentElement.classList.add('dark');
       themeToggle.checked = true;
     }
+    // Profil butonu yönlendirme
+    document.getElementById('back-profile-btn').onclick = function() {
+      window.location.href = 'profile.html';
+    };
   </script>
 </body>
 </html> 
